@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Traits\ComsumesExternalService;
+use App\Traits\ConsumesExternalService;
 
 class ApiHrisService
 {
-    use ComsumesExternalService;
+    use ConsumesExternalService;
 
     /**
      * [$baseUri description]
