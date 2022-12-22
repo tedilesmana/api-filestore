@@ -1,0 +1,91 @@
+version: "2"
+services:
+    nginx:
+        build:
+            context: ./
+            dockerfile: nginx.dockerfile
+        volumes:
+            - ./:/var/www
+            - nginx-conf_ga:/etc/nginx/conf.d
+        env_file: ".env"
+        restart: always
+        ports:
+            - "8081:80"
+        links:
+            - php
+        networks:
+            - api-gateway
+
+    php:
+        build:
+            context: ./
+            dockerfile: php.dockerfile
+        tty: true
+        volumes:
+            - ./:/var/www
+            - nginx-conf_ga:/etc/nginx/
+        restart: always
+        links:
+            - mariadb
+        environment:
+            - "DB_PORT=3306"
+            - "DB_HOST=mariadb"
+        networks:
+            - api-gateway
+
+    mariadb:
+        image: mariadb
+        tty: true
+        restart: always
+        container_name: api-gateway.mariadb
+        networks:
+            - api-gateway
+        ports:
+            - '3306:3306'
+        volumes:
+            - './docker/mysql/config/mariadb.cnf:/etc/mysql/conf.d/custom.cnf:ro'
+            - dbmysql_ga:/var/lib/mysql/
+        environment:
+            - MYSQL_PASSWORD=root
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=api-gateway-staging
+
+    redis:
+        image: bitnami/redis:latest
+        restart: always
+        tty: true
+        container_name: api-gateway.redis
+        volumes:
+            - dbredis_ga:/bitnami/redis/data
+        networks:
+            - api-gateway
+        environment:
+            - ALLOW_EMPTY_PASSWORD=no
+            - REDIS_PASSWORD=root
+        ports:
+            - "6378:6379"
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        environment:
+            PMA_USER: root
+            PMA_PASSWORD: root
+            PMA_HOSTS: mariadb
+            PMA_PORT: 3306
+            PMA_ARBITRARY: 1
+        restart: always
+        ports:
+            - "9087:80"
+        links:
+            - "mariadb:mariadb"
+        networks:
+            - api-gateway
+
+volumes:
+    dbmysql_ga:
+    dbredis_ga:
+    nginx-conf_ga:
+
+networks:
+    api-gateway:
+        driver: bridge

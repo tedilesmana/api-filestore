@@ -1,0 +1,424 @@
+<?php
+
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Spatie\ImageOptimizer\OptimizerChain;
+use Spatie\ImageOptimizer\Optimizers\Cwebp;
+use Spatie\ImageOptimizer\Optimizers\Gifsicle;
+use Spatie\ImageOptimizer\Optimizers\Jpegoptim;
+use Spatie\ImageOptimizer\Optimizers\Optipng;
+use Spatie\ImageOptimizer\Optimizers\Pngquant;
+use Spatie\ImageOptimizer\Optimizers\Svgo;
+use WebPConvert\WebPConvert;
+
+function generalDateFormat($date)
+{
+    return Carbon::parse($date)->format('d M Y');
+}
+
+function generateCode($last_code, $initial_code)
+{
+    if (!$last_code) {
+        return $initial_code . '-00000000001';
+    }
+
+    $explode_seller_code = explode('-', $last_code);
+
+    if (count($explode_seller_code) > 1) {
+        $code = $explode_seller_code[2];
+        $string = preg_replace("/[^0-9\.]/", '', $code);
+        return $initial_code . '-' . sprintf('%011d', $string + 1);
+    } else {
+        return $initial_code . '-00000000001';
+    }
+}
+
+function decodePhoneNumber($phone)
+{
+    $phone_number = explode('#', $phone);
+
+    return $phone_number[0];
+}
+
+function uploadImage($fileImage, $image, $directory, $type, $filename)
+{
+    $directoryFile = $directory . '/' . Carbon::now()->format('Y-M-d');
+    $file = $fileImage;
+    $fileSize = $file->getSize();
+    $extention = $file->extension();
+    $fileName = $filename;
+    $imageNameWithExtention = $fileName . '.' . $extention;
+
+    if ($extention == 'svg') {
+        $image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
+
+        $data = [
+            "size" => $fileSize,
+            "extention" => 'svg',
+            "type" => $type,
+            "image_url" => '/' . $directoryFile . '/' . $imageNameWithExtention,
+        ];
+
+        $dataImage = [
+            "image" => $data
+        ];
+
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
+
+        return [$dataImage];
+    }
+
+    if ($extention == 'jpg' || $extention == 'jpeg' || $extention == 'png') {
+        $image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
+
+        $data = [
+            "size" => $fileSize,
+            "extention" => 'svg',
+            "type" => $type,
+            "image_url" => '/' . $directoryFile . '/' . $imageNameWithExtention,
+        ];
+
+        $dataImage = [
+            "image" => $data
+        ];
+
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
+
+        return [$dataImage];
+        // $result = resizeImage($directoryFile, $imageNameWithExtention, $fileName);
+        // return $result;
+    }
+
+    if ($extention == 'webp') {
+        $image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
+
+        $data = [
+            "size" => $fileSize,
+            "extention" => 'webp',
+            "type" => $type,
+            "image_url" => '/' . $directoryFile . '/' . $imageNameWithExtention,
+        ];
+
+        $dataImage = [
+            "image" => $data
+        ];
+
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
+
+        return [$dataImage];
+    }
+}
+
+function uploadVideo($video)
+{
+    $video->validate([
+        'video' => 'required|file|mimetypes:video/mp4',
+    ]);
+
+    $videoName = time() . '.' . $video->extension();
+
+    $video->move(public_path('videos'),  $videoName);
+
+    return url('') . '/' . $videoName;
+}
+
+function uploadFile($file)
+{
+    $file->validate([
+        'file' => 'required|csv,txt,xlx,xls,pdf|max:2048',
+    ]);
+
+    $fileName = time() . '.' . $file->extension();
+
+    $file->move(public_path('files'), $fileName);
+
+    return url('') . '/' . $fileName;
+}
+
+function deleteImage($image_url)
+{
+    return File::delete(storage_path('app/public/image' . $image_url));
+}
+
+function resizeImage($directoryFile, $imageNameWithExtension, $fileName)
+{
+    $optimizerChain = (new OptimizerChain)
+        ->addOptimizer(new Jpegoptim([
+            '-m85',
+            '--strip-all',
+            '--all-progressive',
+        ]))
+        ->addOptimizer(new Pngquant([
+            '--force',
+        ]))
+        ->addOptimizer(new Optipng([
+            '-i0',
+            '-o2',
+            '-quiet',
+        ]))
+        ->addOptimizer(new Svgo([
+            '--disable=cleanupIDs',
+        ]))
+        ->addOptimizer(new Gifsicle([
+            '-b',
+            '-O3'
+        ]))
+        ->addOptimizer(new Cwebp([
+            '-m 6',
+            '-pass 10',
+            '-mt',
+            '-q 90',
+        ]));
+
+    $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
+    $pathFile = storage_path('app/public/image/' . $directoryFile . '/' . $imageNameWithExtension);
+    $images = $multiSizeImage->processImage($pathFile);
+    $imageDetails = array();
+
+    foreach ($images as $image) {
+        $imageNameWithExtention = substr($image, 33);
+        $output = '';
+        $type = '';
+
+        if (str_contains($imageNameWithExtention, 'lg')) {
+            $output .= storage_path('app/public/image/' . $directoryFile . '/' . $fileName . time() . '@lg' . '.webp');
+            $type .= 'large';
+            convertToWebp($image, $output);
+        } else if (str_contains($imageNameWithExtention, 'md')) {
+            $output .= storage_path('app/public/image/' . $directoryFile . '/' . $fileName . time() . '@md' . '.webp');
+            $type .= 'medium';
+            convertToWebp($image, $output);
+        } else if (str_contains($imageNameWithExtention, 'sm')) {
+            $output .= storage_path('app/public/image/' . $directoryFile . '/' . $fileName . time() . '@sm' . '.webp');
+            $type .= 'small';
+            convertToWebp($image, $output);
+        } else {
+            $output .= storage_path('app/public/image/' . $directoryFile . '/' . $fileName . time() . '@tb' . '.webp');
+            $type .= 'thumbnail';
+            convertToWebp($image, $output);
+        }
+
+        $dataImage = [
+            "size" => Storage::size(substr($image, 21)),
+            "extention" => \File::extension(substr($image, 21)),
+            "type" => $type,
+            "image_url" => substr($image, 33),
+        ];
+
+        $dataWebp = [
+            "size" => Storage::size(substr($output, 21)),
+            "extention" => \File::extension(substr($output, 21)),
+            "type" => $type,
+            "image_url" => substr($output, 33),
+        ];
+
+        $dataImage = [
+            "webp" => $dataWebp,
+            "image" => $dataImage
+        ];
+
+        $imageDetails = [$dataImage, ...$imageDetails];
+    }
+
+    return $imageDetails;
+}
+
+function uploadToGoogleStorage($image_path, $filename)
+{
+    $disk = \Storage::disk('gcs');
+    $fileSource = fopen($image_path, 'r');
+    $result = $disk->write($filename, $fileSource);
+    return $result;
+}
+
+function convertToWebp($input, $output)
+{
+    $options = [
+
+        // failure handling
+        'fail'                 => 'original',   // ('original' | 404' | 'throw' | 'report')
+        'fail-when-fail-fails' => 'throw',      // ('original' | 404' | 'throw' | 'report')
+
+        // options influencing the decision process of what to be served
+        'reconvert' => false,         // if true, existing (cached) image will be discarded
+        'serve-original' => false,    // if true, the original image will be served rather than the converted
+        'show-report' => false,       // if true, a report will be output rather than the raw image
+
+        // warning handling
+        'suppress-warnings' => true,            // if you set to false, make sure that warnings are not echoed out!
+
+        // options when serving an image (be it the webp or the original, if the original is smaller than the webp)
+        'serve-image' => [
+            'headers' => [
+                'cache-control' => true,
+                'content-length' => true,
+                'content-type' => true,
+                'expires' => false,
+                'last-modified' => true,
+                'vary-accept' => false
+            ],
+            'cache-control-header' => 'public, max-age=31536000',
+        ],
+
+        // redirect tweak
+        'redirect-to-self-instead-of-serving' => false,  // if true, a redirect will be issues rather than serving
+
+        'convert' => [
+            'quality' => 'auto',
+        ]
+    ];
+
+    return WebPConvert::convert($input, $output, $options);
+}
+
+function uploadImageForSellerIdentity($request, $directory)
+{
+    $directoryFile = $directory . '/' . Carbon::now()->format('Y-M-d');
+
+
+    $file = $request->file('image');
+    $fileSize = $file->getSize();
+    $extention = $file->extension();
+    $fileName = time();
+    $imageNameWithExtention = $fileName . '.' . $extention;
+
+    if ($extention == 'svg') {
+        $request->image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
+
+        $data = [
+            "size" => $fileSize,
+            "extention" => 'svg',
+            "type" => 'identity_card_image',
+            "image_url" => '/' . $directoryFile . '/' . $imageNameWithExtention,
+        ];
+
+        $dataImage = [
+            "image" => $data
+        ];
+
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
+
+        return [$dataImage];
+    }
+
+    if ($extention == 'jpg' || $extention == 'jpeg' || $extention == 'png') {
+        $request->image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
+
+        $data = [
+            "size" => $fileSize,
+            "extention" => 'svg',
+            "type" => 'general',
+            "image_url" => '/' . $directoryFile . '/' . $imageNameWithExtention,
+        ];
+
+        $dataImage = [
+            "image" => $data
+        ];
+
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
+
+        return [$dataImage];
+    }
+
+    if ($extention == 'webp') {
+        $request->image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
+
+        $data = [
+            "size" => $fileSize,
+            "extention" => 'webp',
+            "type" => 'general',
+            "image_url" => '/' . $directoryFile . '/' . $imageNameWithExtention,
+        ];
+
+        $dataImage = [
+            "image" => $data
+        ];
+
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
+
+        return [$dataImage];
+    }
+}
+
+function sendNotificationUsingTopic()
+{
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://fcm.googleapis.com/fcm/send',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => '{
+            "notification": {
+                "body": "subject",
+                "title": "title"
+            },
+            "priority": "high",
+            "data": {
+                "click_action": "FLUTTER_NOTIFICATION_CLICK",
+                "id": "1",
+                "status": "done",
+                "sound": "default",
+                "screen": "yourTopicName"
+            },
+            "to": "/topics/customerWithDriver"
+        }',
+        CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json',
+            'Authorization: key=AAAASdzIVK4:APA91bH5F9g2cAhJWdvx1rD2KVWv1vUIllgFLE7uHUz0OXNUh_zTEG4TZm4takgj3GIH8TsLAiZQXcJKRaUJwIKZ6b4MV2TO_6hDcr76doT4mh02yc5Lvc6izCPQAdHI9C8_8oo4jMCZ'
+        ),
+    ));
+
+    $response = curl_exec($curl);
+
+    curl_close($curl);
+    return $response;
+}
+
+function sendNotification($receiver, $notification, $data)
+{
+    $SERVER_API_KEY = "AAAASdzIVK4:APA91bH5F9g2cAhJWdvx1rD2KVWv1vUIllgFLE7uHUz0OXNUh_zTEG4TZm4takgj3GIH8TsLAiZQXcJKRaUJwIKZ6b4MV2TO_6hDcr76doT4mh02yc5Lvc6izCPQAdHI9C8_8oo4jMCZ";
+
+    $notificationBody = [
+        "to"            => $receiver,
+        "priority"      => "high",
+        "data"          => $data,
+        "notification"  => [
+            "title" => $notification->title,
+            "body"  => $notification->body,
+        ]
+    ];
+
+    $json_data = json_encode($notificationBody);
+
+    $headers = [
+        'Authorization: key=' . $SERVER_API_KEY,
+        'Content-Type: application/json',
+    ];
+
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $json_data);
+
+    $response = curl_exec($ch);
+
+    curl_close($ch);
+
+    Log::debug(json_encode($response));
+}
