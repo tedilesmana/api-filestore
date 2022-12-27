@@ -18,13 +18,13 @@ class CreateLecturersTable extends Migration
             $table->foreignId('user_id')->constrained()
                 ->onUpdate('restrict')
                 ->onDelete('restrict');
-            $table->dateTime('entry_year');
-            $table->dateTime('out_year');
+            $table->dateTime('entry_year')->nullable();
+            $table->dateTime('out_year')->nullable();
             $table->bigInteger('lecturer_id');
             $table->bigInteger('periode_id');
-            $table->integer('departement');
-            $table->integer('level');
-            $table->integer('is_active');
+            $table->integer('departement_id');
+            $table->integer('level')->nullable();
+            $table->integer('is_active')->nullable();
             $table->timestamps();
         });
     }

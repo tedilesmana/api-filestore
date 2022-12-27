@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers\Api\Hris;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseController;
+use App\Services\ApiHrisService;
 use Illuminate\Http\Request;
 
-class MasterLocationController extends Controller
+class MasterLocationController extends BaseController
 {
+    private $apiHrisService;
+
+    public function __construct(ApiHrisService $apiHrisService)
+    {
+        $this->apiHrisService = $apiHrisService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +22,17 @@ class MasterLocationController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $response = (object) $this->apiHrisService->getAllMasterLocationService();
+
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 
     /**
@@ -35,7 +53,16 @@ class MasterLocationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $response = (object) $this->apiHrisService->createMasterLocationService($request);
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 
     /**
@@ -46,7 +73,16 @@ class MasterLocationController extends Controller
      */
     public function show($id)
     {
-        //
+        try {
+            $response = (object) $this->apiHrisService->getDetailMasterLocationService($id);
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 
     /**
@@ -69,7 +105,16 @@ class MasterLocationController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $response = (object) $this->apiHrisService->updateMasterLocationService($request, $id);
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 
     /**
@@ -80,6 +125,15 @@ class MasterLocationController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $response = (object) $this->apiHrisService->deleteMasterLocationService($id);
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 }

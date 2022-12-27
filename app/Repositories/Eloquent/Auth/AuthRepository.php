@@ -5,6 +5,8 @@ namespace App\Repositories\Eloquent\Auth;
 use App\Models\User;
 use App\Http\Controllers\BaseController;
 use App\Http\Resources\User\UserResource;
+use App\Models\Lecturer;
+use App\Models\UserDetail;
 use App\Repositories\Interfaces\Auth\AuthRepositoryInterface;
 use App\Services\MessageGatewayService;
 use Carbon\Carbon;
@@ -49,15 +51,34 @@ class AuthRepository implements AuthRepositoryInterface
         $input['google_password'] = Hash::make($request["google_id"]);
         $input['google_id'] = $request["google_id"];
         $input['device_id'] = $request["device_id"];
-        $input['personal_id'] = $request["personal_id"];
-        $input['periode_id'] = $request["periode_id"];
-        $input['is_active'] = $request["is_active"];
-        $input['level'] = $request["level"];
-        $input['departement'] = $request["departement"];
 
         $user = User::updateOrCreate([
             'email'   => $request['email'],
         ], $input);
+
+        $lecture = [];
+        $lecture['user_id'] = $user->id;
+        $lecture['lecturer_id'] = $request["personal_id"];
+        $lecture['periode_id'] = $request["periode_id"];
+        $lecture['is_active'] = $request["is_active"];
+        $lecture['level'] = $request["level"];
+        $lecture['departement_id'] = $request["departement"];
+
+        UserDetail::updateOrCreate([
+            'user_id'   => $user->id,
+        ], $lecture);
+
+        $user_detail = [];
+        $user_detail['user_id'] = $user->id;
+        $user_detail['lecturer_id'] = $request["personal_id"];
+        $user_detail['periode_id'] = $request["periode_id"];
+        $user_detail['is_active'] = $request["is_active"];
+        $user_detail['level'] = $request["level"];
+        $user_detail['departement_id'] = $request["departement"];
+
+        Lecturer::updateOrCreate([
+            'user_id'   => $user->id,
+        ], $user_detail);
 
         return $user;
     }

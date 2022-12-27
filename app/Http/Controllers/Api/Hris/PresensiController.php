@@ -51,7 +51,16 @@ class PresensiController extends BaseController
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $response = (object) $this->apiHrisService->doPresensiCheckInCheckOutService($request);
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 
     /**
@@ -62,7 +71,16 @@ class PresensiController extends BaseController
      */
     public function show($id)
     {
-        //
+        try {
+            $response = (object) $this->apiHrisService->getAllPresensiByDepartementService();
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 
     /**

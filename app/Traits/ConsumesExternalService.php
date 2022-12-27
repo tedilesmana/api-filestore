@@ -12,7 +12,7 @@ trait ConsumesExternalService
      * @return string
      */
 
-    public function performeRequest($method, $requestUrl, $form_params = [], $headers = [])
+    public function performeRequest($method, $requestUrl, $form_params = null, $headers = [])
     {
         $client = new Client();
 
@@ -20,8 +20,8 @@ trait ConsumesExternalService
             $headers["Authorization"] = $this->secret;
         }
 
-        $request = new Request('GET', 'https://apidev-hris.paramadina.ac.id/api/presensi?personal_id=503', $headers);
-        $response = $client->sendAsync($request)->wait();
+        $request = new Request($method, 'https://apidev-hris.paramadina.ac.id/api' . $requestUrl, $headers);
+        $response = $client->sendAsync($request,  $form_params)->wait();
         return json_decode($response->getBody()->getContents());
     }
 }

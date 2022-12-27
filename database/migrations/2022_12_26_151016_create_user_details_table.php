@@ -18,10 +18,10 @@ class CreateUserDetailsTable extends Migration
             $table->foreignId('user_id')->constrained()
                 ->onUpdate('restrict')
                 ->onDelete('restrict');
-            $table->date('birthdate');
-            $table->integer('age');
+            $table->date('birthdate')->nullable();
+            $table->integer('age')->nullable();
             $table->enum('gender', ["laki-laki", "perempuan"])->default(null)->nullable();
-            $table->string('address');
+            $table->string('address')->nullable();
             $table->timestamps();
         });
     }

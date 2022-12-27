@@ -59,4 +59,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(OauthAccessToken::class);
     }
+
+    // public function userDetails()
+    // {
+    //     return $this->hasMany(UserDetail::class);
+    // }
+
+    public function userDetail()
+    {
+        return $this->hasOne(UserDetail::class);
+    }
+
+    public function lecturer()
+    {
+        return $this->hasOne(Lecturer::class);
+    }
 }
