@@ -21,8 +21,9 @@ class ApiHrisService
         $this->secret = config('services.hris_api.secret');
     }
 
+    //Presensi
     public function getAllPresensiByUserService()
     {
-        return $this->performeRequest("GET", "/presensi");
+        return $this->performeRequest("GET", "/presensi?personal_id=503");
     }
 }

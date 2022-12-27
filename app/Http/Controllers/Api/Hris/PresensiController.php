@@ -23,12 +23,11 @@ class PresensiController extends BaseController
     {
         try {
             $response = (object) $this->apiHrisService->getAllPresensiByUserService();
-            return $this->successResponse($response->message, $response->data);
-            // if ($response->success) {
-            //     return $this->successResponse($response->message, $response->data);
-            // } else {
-            //     return $this->errorResponse($response->message, $response->data);
-            // }
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
         } catch (\Exception $e) {
             return $this->badResponse($e->getMessage(), null);
         }
