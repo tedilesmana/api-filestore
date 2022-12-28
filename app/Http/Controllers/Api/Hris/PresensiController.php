@@ -72,7 +72,7 @@ class PresensiController extends BaseController
     public function show($id)
     {
         try {
-            $response = (object) $this->apiHrisService->getAllPresensiByDepartementService();
+            $response = (object) $this->apiHrisService->getAllPresensiByDepartementService($id);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {

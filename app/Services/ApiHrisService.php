@@ -28,9 +28,9 @@ class ApiHrisService
         return $this->performeRequest("GET", "/presensi?personal_id=" . Auth::user()->lecturer->lecturer_id);
     }
 
-    public function getAllPresensiByDepartementService()
+    public function getAllPresensiByDepartementService($id)
     {
-        return $this->performeRequest("GET", "/presensi/2?personal_id=" . Auth::user()->lecturer->lecturer_id . "&department_id=" . Auth::user()->lecturer->departement_id);
+        return $this->performeRequest("GET", "/presensi/" . $id . "?personal_id=" . Auth::user()->lecturer->lecturer_id . "&department_id=" . Auth::user()->lecturer->departement_id);
     }
 
     public function doPresensiCheckInCheckOutService($request)
@@ -52,11 +52,11 @@ class ApiHrisService
                 ],
                 [
                     'name' => 'personal_id',
-                    'contents' => $request->personal_id
+                    'contents' => Auth::user()->lecturer->lecturer_id
                 ],
                 [
                     'name' => 'departement',
-                    'contents' => $request->departement
+                    'contents' => Auth::user()->lecturer->departement_id
                 ]
             ]
         ];
