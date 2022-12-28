@@ -12,7 +12,7 @@ trait ConsumesExternalService
      * @return string
      */
 
-    public function performeRequest($method, $requestUrl, $form_params = null, $headers = [])
+    public function performeRequest($method, $requestUrl, $form_params = [], $headers = [])
     {
         $client = new Client();
 
