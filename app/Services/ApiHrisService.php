@@ -57,6 +57,22 @@ class ApiHrisService
                 [
                     'name' => 'departement',
                     'contents' => Auth::user()->lecturer->departement_id
+                ],
+                [
+                    'name' => 'in_longitude',
+                    'contents' => $request->in_longitude
+                ],
+                [
+                    'name' => 'in_latitude',
+                    'contents' => $request->in_latitude
+                ],
+                [
+                    'name' => 'out_longitude',
+                    'contents' => $request->out_longitude
+                ],
+                [
+                    'name' => 'out_latitude',
+                    'contents' => $request->out_latitude
                 ]
             ]
         ];
