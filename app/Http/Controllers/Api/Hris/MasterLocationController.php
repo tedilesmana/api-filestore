@@ -71,10 +71,10 @@ class MasterLocationController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
         try {
-            $response = (object) $this->apiHrisService->getDetailMasterLocationService($id);
+            $response = (object) $this->apiHrisService->getDetailMasterLocationService($id, $request);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {
@@ -103,7 +103,7 @@ class MasterLocationController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id) 
+    public function update(Request $request, $id)
     {
         try {
             $response = (object) $this->apiHrisService->updateMasterLocationService($request, $id);
