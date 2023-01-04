@@ -14,6 +14,7 @@ class PresensiController extends BaseController
     {
         $this->apiHrisService = $apiHrisService;
     }
+
     /**
      * Display a listing of the resource.
      *
