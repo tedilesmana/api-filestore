@@ -89,7 +89,7 @@ class ApiHrisService
 
     public function getDetailMasterLocationService($id, $request)
     {
-        return $this->performeRequest("GET", "/master-location/" . $id . `?latitude=$request->latitude&longitude=$request->latitude`);
+        return $this->performeRequest("GET", "/master-location/$id?latitude=$request->latitude&longitude=$request->longitude");
     }
 
     public function deleteMasterLocationService($id)
