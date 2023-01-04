@@ -20,7 +20,7 @@ trait ConsumesExternalService
             $headers["Authorization"] = $this->secret;
         }
 
-        $request = new Request($method, 'https://apidev-hris.paramadina.ac.id/api' . $requestUrl, $headers);
+        $request = new Request($method, 'https://mobile-hris.paramadina.ac.id/api' . $requestUrl, $headers);
         $response = $client->sendAsync($request,  $form_params)->wait();
         return json_decode($response->getBody()->getContents());
     }
