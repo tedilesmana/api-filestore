@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\ApiHris;
 
 use App\Traits\ConsumesExternalService;
 use Illuminate\Support\Facades\Auth;
 
-class ApiHrisService
+class PresensiService
 {
     use ConsumesExternalService;
 
@@ -22,7 +22,6 @@ class ApiHrisService
         $this->secret = config('services.hris_api.secret');
     }
 
-    //Presensi
     public function getAllPresensiByUserService()
     {
         return $this->performeRequest("GET", "/presensi?personal_id=" . Auth::user()->lecturer->lecturer_id);

@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api\Hris;
 
 use App\Http\Controllers\BaseController;
-use App\Services\ApiHris\MasterLocationService;
+use App\Services\ApiHris\WorkingShiftService;
 use Illuminate\Http\Request;
 
-class MasterLocationController extends BaseController
+class WorkingShiftController extends BaseController
 {
-    private $masterLocation;
+    private $workingShiftService;
 
-    public function __construct(MasterLocationService $masterLocation)
+    public function __construct(WorkingShiftService $workingShiftService)
     {
-        $this->masterLocation = $masterLocation;
+        $this->workingShiftService = $workingShiftService;
     }
 
     /**
@@ -22,17 +22,7 @@ class MasterLocationController extends BaseController
      */
     public function index()
     {
-        try {
-            $response = (object) $this->masterLocation->getAllMasterLocationService();
-
-            if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
-            } else {
-                return $this->errorResponse($response->message, $response->data);
-            }
-        } catch (\Exception $e) {
-            return $this->badResponse($e->getMessage(), null);
-        }
+        //
     }
 
     /**
@@ -53,8 +43,19 @@ class MasterLocationController extends BaseController
      */
     public function store(Request $request)
     {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
         try {
-            $response = (object) $this->masterLocation->createMasterLocationService($request);
+            $response = (object) $this->workingShiftService->getDetailWorkingShiftService($id);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {
@@ -71,10 +72,10 @@ class MasterLocationController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id, Request $request)
+    public function getDefaultShift($id)
     {
         try {
-            $response = (object) $this->masterLocation->getDetailMasterLocationService($id, $request);
+            $response = (object) $this->workingShiftService->getDefaultWorkingShiftService($id);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {
@@ -105,16 +106,7 @@ class MasterLocationController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        try {
-            $response = (object) $this->masterLocation->updateMasterLocationService($request, $id);
-            if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
-            } else {
-                return $this->errorResponse($response->message, $response->data);
-            }
-        } catch (\Exception $e) {
-            return $this->badResponse($e->getMessage(), null);
-        }
+        //
     }
 
     /**
@@ -125,15 +117,6 @@ class MasterLocationController extends BaseController
      */
     public function destroy($id)
     {
-        try {
-            $response = (object) $this->masterLocation->deleteMasterLocationService($id);
-            if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
-            } else {
-                return $this->errorResponse($response->message, $response->data);
-            }
-        } catch (\Exception $e) {
-            return $this->badResponse($e->getMessage(), null);
-        }
+        //
     }
 }

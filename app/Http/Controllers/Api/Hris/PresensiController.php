@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api\Hris;
 
 use App\Http\Controllers\BaseController;
-use App\Services\ApiHrisService;
+use App\Services\ApiHris\PresensiService;
 use Illuminate\Http\Request;
 
 class PresensiController extends BaseController
 {
-    private $apiHrisService;
+    private $hrisService;
 
-    public function __construct(ApiHrisService $apiHrisService)
+    public function __construct(PresensiService $hrisService)
     {
-        $this->apiHrisService = $apiHrisService;
+        $this->hrisService = $hrisService;
     }
 
     /**
@@ -23,7 +23,7 @@ class PresensiController extends BaseController
     public function index()
     {
         try {
-            $response = (object) $this->apiHrisService->getAllPresensiByUserService();
+            $response = (object) $this->hrisService->getAllPresensiByUserService();
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {
@@ -53,7 +53,7 @@ class PresensiController extends BaseController
     public function store(Request $request)
     {
         try {
-            $response = (object) $this->apiHrisService->doPresensiCheckInCheckOutService($request);
+            $response = (object) $this->hrisService->doPresensiCheckInCheckOutService($request);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {
@@ -73,7 +73,7 @@ class PresensiController extends BaseController
     public function show($id)
     {
         try {
-            $response = (object) $this->apiHrisService->getAllPresensiByDepartementService($id);
+            $response = (object) $this->hrisService->getAllPresensiByDepartementService($id);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {
