@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api\Hris;
 
 use App\Http\Controllers\BaseController;
-use App\Services\ApiHrisService;
+use App\Services\ApiHris\MasterLocationService;
 use Illuminate\Http\Request;
 
 class MasterLocationController extends BaseController
 {
-    private $apiHrisService;
+    private $masterLocation;
 
-    public function __construct(ApiHrisService $apiHrisService)
+    public function __construct(MasterLocationService $masterLocation)
     {
-        $this->apiHrisService = $apiHrisService;
+        $this->masterLocation = $masterLocation;
     }
 
     /**
@@ -23,7 +23,7 @@ class MasterLocationController extends BaseController
     public function index()
     {
         try {
-            $response = (object) $this->apiHrisService->getAllMasterLocationService();
+            $response = (object) $this->masterLocation->getAllMasterLocationService();
 
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
@@ -54,7 +54,7 @@ class MasterLocationController extends BaseController
     public function store(Request $request)
     {
         try {
-            $response = (object) $this->apiHrisService->createMasterLocationService($request);
+            $response = (object) $this->masterLocation->createMasterLocationService($request);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {
@@ -74,7 +74,7 @@ class MasterLocationController extends BaseController
     public function show($id, Request $request)
     {
         try {
-            $response = (object) $this->apiHrisService->getDetailMasterLocationService($id, $request);
+            $response = (object) $this->masterLocation->getDetailMasterLocationService($id, $request);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {
@@ -106,7 +106,7 @@ class MasterLocationController extends BaseController
     public function update(Request $request, $id)
     {
         try {
-            $response = (object) $this->apiHrisService->updateMasterLocationService($request, $id);
+            $response = (object) $this->masterLocation->updateMasterLocationService($request, $id);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {
@@ -126,7 +126,7 @@ class MasterLocationController extends BaseController
     public function destroy($id)
     {
         try {
-            $response = (object) $this->apiHrisService->deleteMasterLocationService($id);
+            $response = (object) $this->masterLocation->deleteMasterLocationService($id);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {

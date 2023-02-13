@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\ApiHris;
 
 use App\Traits\ConsumesExternalService;
-use Illuminate\Support\Facades\Auth;
 
-class ApiHrisService
+class WorkingShiftService
 {
     use ConsumesExternalService;
 
@@ -22,66 +21,6 @@ class ApiHrisService
         $this->secret = config('services.hris_api.secret');
     }
 
-    //Presensi
-    public function getAllPresensiByUserService()
-    {
-        return $this->performeRequest("GET", "/presensi?personal_id=" . Auth::user()->lecturer->lecturer_id);
-    }
-
-    public function getAllPresensiByDepartementService($id)
-    {
-        return $this->performeRequest("GET", "/presensi/" . $id . "?personal_id=" . Auth::user()->lecturer->lecturer_id . "&department_id=" . Auth::user()->lecturer->departement_id);
-    }
-
-    public function doPresensiCheckInCheckOutService($request)
-    {
-
-        $options = [
-            'multipart' => [
-                [
-                    'name' => 'description',
-                    'contents' => $request->description
-                ],
-                [
-                    'name' => 'type',
-                    'contents' => $request->type
-                ],
-                [
-                    'name' => 'work_location',
-                    'contents' => $request->work_location
-                ],
-                [
-                    'name' => 'personal_id',
-                    'contents' => Auth::user()->lecturer->lecturer_id
-                ],
-                [
-                    'name' => 'departement',
-                    'contents' => Auth::user()->lecturer->departement_id
-                ],
-                [
-                    'name' => 'in_longitude',
-                    'contents' => $request->in_longitude
-                ],
-                [
-                    'name' => 'in_latitude',
-                    'contents' => $request->in_latitude
-                ],
-                [
-                    'name' => 'out_longitude',
-                    'contents' => $request->out_longitude
-                ],
-                [
-                    'name' => 'out_latitude',
-                    'contents' => $request->out_latitude
-                ]
-            ]
-        ];
-
-        return $this->performeRequest("POST", "/presensi", $options);
-    }
-
-
-    // Master Location
     public function getAllMasterLocationService()
     {
         return $this->performeRequest("GET", "/master-location");

@@ -30,4 +30,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::resource('presensi', PresensiController::class);
     Route::resource('master-location', MasterLocationController::class);
+    Route::resource('working-shift', WorkingShiftController::class);
 });
