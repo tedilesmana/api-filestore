@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers\Api\Hris;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseController;
+use App\Services\ApiHris\WorkingShiftService;
 use Illuminate\Http\Request;
 
-class WorkingShiftController extends Controller
+class WorkingShiftController extends BaseController
 {
+    private $workingShiftService;
+
+    public function __construct(WorkingShiftService $workingShiftService)
+    {
+        $this->workingShiftService = $workingShiftService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -46,7 +54,36 @@ class WorkingShiftController extends Controller
      */
     public function show($id)
     {
-        //
+        try {
+            $response = (object) $this->workingShiftService->getDetailWorkingShiftService($id);
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getDefaultShift($id)
+    {
+        try {
+            $response = (object) $this->workingShiftService->getDefaultWorkingShiftService($id);
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 
     /**

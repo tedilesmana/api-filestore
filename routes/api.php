@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Hris\MasterLocationController;
 use App\Http\Controllers\Api\Hris\PresensiController;
+use App\Http\Controllers\Api\Hris\WorkingShiftController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,5 +31,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::resource('presensi', PresensiController::class);
     Route::resource('master-location', MasterLocationController::class);
+    Route::get('working-shift/default/{id}', [WorkingShiftController::class, 'getDefaultShift']);
     Route::resource('working-shift', WorkingShiftController::class);
 });

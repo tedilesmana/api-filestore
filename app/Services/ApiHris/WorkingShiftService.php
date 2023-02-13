@@ -21,22 +21,27 @@ class WorkingShiftService
         $this->secret = config('services.hris_api.secret');
     }
 
-    public function getAllMasterLocationService()
+    public function getAllWorkingShiftService()
     {
         return $this->performeRequest("GET", "/master-location");
     }
 
-    public function getDetailMasterLocationService($id, $request)
+    public function getDetailWorkingShiftService($id)
     {
-        return $this->performeRequest("GET", "/master-location/$id?latitude=$request->latitude&longitude=$request->longitude");
+        return $this->performeRequest("GET", "/working-shift/" . $id);
     }
 
-    public function deleteMasterLocationService($id)
+    public function getDefaultWorkingShiftService($id)
+    {
+        return $this->performeRequest("GET", "/working-shift/default/" . $id);
+    }
+
+    public function deleteWorkingShiftService($id)
     {
         return $this->performeRequest("DELETE", "/master-location/" . $id);
     }
 
-    public function createMasterLocationService($request)
+    public function createWorkingShiftService($request)
     {
         $options = [
             'multipart' => [
@@ -58,7 +63,7 @@ class WorkingShiftService
         return $this->performeRequest("POST", "/master-location", $options);
     }
 
-    public function updateMasterLocationService($request, $id)
+    public function updateWorkingShiftService($request, $id)
     {
         $options = [
             'multipart' => [
