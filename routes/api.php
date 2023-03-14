@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\GatewayManager\ApplicationController;
+use App\Http\Controllers\Api\GatewayManager\FeatureController;
+use App\Http\Controllers\Api\GatewayManager\GatewayManagerController;
+use App\Http\Controllers\Api\GatewayManager\ModuleController;
 use App\Http\Controllers\Api\Hris\MasterLocationController;
 use App\Http\Controllers\Api\Hris\PresensiController;
 use App\Http\Controllers\Api\Hris\WorkingShiftController;
@@ -33,4 +37,10 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('master-location', MasterLocationController::class);
     Route::get('working-shift/default/{id}', [WorkingShiftController::class, 'getDefaultShift']);
     Route::resource('working-shift', WorkingShiftController::class);
+    Route::resource('gateway-application', ApplicationController::class);
+    Route::resource('gateway-module', ModuleController::class);
+    Route::resource('gateway-feature', FeatureController::class);
+    Route::post('gateway-manager/{app}/{module}/{feature}/{title}', [GatewayManagerController::class, 'proceedRequest']);
+    Route::put('gateway-manager/{app}/{module}/{feature}/{title}/{action}', [GatewayManagerController::class, 'updateRequest']);
+    Route::resource('gateway-manager', GatewayManagerController::class);
 });
