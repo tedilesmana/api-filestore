@@ -36,7 +36,12 @@ class SettingController extends BaseController
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $response = Setting::create($request->all);
+            return $this->successResponse("Created data setting", $response);
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 
     /**
@@ -75,7 +80,15 @@ class SettingController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $detail = Setting::find($id);
+            $detail->type = $request->type;
+            $detail->value = $request->value;
+            $detail->save();
+            return $this->successResponse("Updated data setting", true);
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 
     /**
@@ -86,6 +99,11 @@ class SettingController extends BaseController
      */
     public function destroy($id)
     {
-        //
+        try {
+            $response = Setting::where('id', $id)->delete();
+            return $this->successResponse("Deleted data setting", $response);
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 }
