@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\GatewayManager\GatewayManagerController;
 use App\Http\Controllers\Api\GatewayManager\ModuleController;
 use App\Http\Controllers\Api\Hris\MasterLocationController;
 use App\Http\Controllers\Api\Hris\PresensiController;
+use App\Http\Controllers\Api\Hris\SettingController;
 use App\Http\Controllers\Api\Hris\WorkingShiftController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,4 +44,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('gateway-manager/{app}/{module}/{feature}/{title}', [GatewayManagerController::class, 'proceedRequest']);
     Route::put('gateway-manager/{app}/{module}/{feature}/{title}/{action}', [GatewayManagerController::class, 'updateRequest']);
     Route::resource('gateway-manager', GatewayManagerController::class);
+    Route::resource('settings', SettingController::class);
 });
