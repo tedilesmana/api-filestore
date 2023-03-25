@@ -37,7 +37,7 @@ class SettingController extends BaseController
     public function store(Request $request)
     {
         try {
-            $response = Setting::create($request->all);
+            $response = Setting::create($request->all());
             return $this->successResponse("Created data setting", $response);
         } catch (\Exception $e) {
             return $this->badResponse($e->getMessage(), null);
