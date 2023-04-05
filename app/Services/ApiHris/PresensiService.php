@@ -22,9 +22,9 @@ class PresensiService
         $this->secret = config('services.hris_api.secret');
     }
 
-    public function getAllPresensiByUserService()
+    public function getAllPresensiByUserService($request)
     {
-        return $this->performeRequest("GET", "/presensi?personal_id=" . Auth::user()->lecturer->lecturer_id);
+        return $this->performeRequest("GET", "/presensi?personal_id=" . Auth::user()->lecturer->lecturer_id . "&page=" . $request->page);
     }
 
     public function getAllPresensiByDepartementService($id)

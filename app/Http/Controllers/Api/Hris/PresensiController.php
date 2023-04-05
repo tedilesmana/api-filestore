@@ -20,10 +20,10 @@ class PresensiController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $response = (object) $this->hrisService->getAllPresensiByUserService();
+            $response = (object) $this->hrisService->getAllPresensiByUserService($request);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data);
             } else {
