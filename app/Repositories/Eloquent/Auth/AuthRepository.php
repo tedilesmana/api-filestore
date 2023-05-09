@@ -272,7 +272,7 @@ class AuthRepository implements AuthRepositoryInterface
                         }
                     }
                 } else {
-                    if (Hash::check($request->google_id, $tbl_user_auth->first()->google_password)) {
+                    if (Hash::check($request->password, $tbl_user_auth->first()->user_password) || Hash::check($request->password, $tbl_user_auth->first()->google_password)) {
                         if ($tbl_user_auth->first()->device_id == $request->device_id) {
                             $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $request->google_id), "user" => new UserResource($tbl_user_auth->first())];
                             return $this->apiController->trueResult("Selamat datang kembali", $data);
