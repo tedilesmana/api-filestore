@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\FileHandler\FileHandlerController;
 use App\Http\Controllers\Api\GatewayManager\ApplicationController;
 use App\Http\Controllers\Api\GatewayManager\FeatureController;
 use App\Http\Controllers\Api\GatewayManager\GatewayManagerController;
@@ -45,4 +46,8 @@ Route::middleware('auth:api')->group(function () {
     Route::put('gateway-manager/{app}/{module}/{feature}/{title}/{action}', [GatewayManagerController::class, 'updateRequest']);
     Route::resource('gateway-manager', GatewayManagerController::class);
     Route::resource('settings', SettingController::class);
+    Route::post('upload/file/local', [FileHandlerController::class, 'uploadFileToLocal']);
+    Route::post('upload/file/s3', [FileHandlerController::class, 'uploadFileToS3']);
+    Route::post('upload/file/resize', [FileHandlerController::class, 'uploadFileResize']);
+    Route::post('upload/file/moveToS3', [FileHandlerController::class, 'moveToS3']);
 });

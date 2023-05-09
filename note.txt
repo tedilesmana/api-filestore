@@ -17,3 +17,9 @@ php artisan make:migration create_looses_table --create=looses
 
 
 update server
+
+tbl_master_personal
+hrd_personal_track_jbtn_struktural
+
+
+https://stackoverflow.com/questions/40606818/laravel-passport-custom-password-column

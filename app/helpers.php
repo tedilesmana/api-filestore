@@ -1,6 +1,8 @@
 <?php
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Spatie\ImageOptimizer\OptimizerChain;
 use Spatie\ImageOptimizer\Optimizers\Cwebp;
@@ -87,8 +89,6 @@ function uploadImage($fileImage, $image, $directory, $type, $filename)
         uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
 
         return [$dataImage];
-        // $result = resizeImage($directoryFile, $imageNameWithExtention, $fileName);
-        // return $result;
     }
 
     if ($extention == 'webp') {
@@ -143,7 +143,7 @@ function deleteImage($image_url)
     return File::delete(storage_path('app/public/image' . $image_url));
 }
 
-function resizeImage($directoryFile, $imageNameWithExtension, $fileName)
+function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 {
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
@@ -174,7 +174,7 @@ function resizeImage($directoryFile, $imageNameWithExtension, $fileName)
         ]));
 
     $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
-    $pathFile = storage_path('app/public/image/' . $directoryFile . '/' . $imageNameWithExtension);
+    $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
     $images = $multiSizeImage->processImage($pathFile);
     $imageDetails = array();
 
@@ -184,33 +184,33 @@ function resizeImage($directoryFile, $imageNameWithExtension, $fileName)
         $type = '';
 
         if (str_contains($imageNameWithExtention, 'lg')) {
-            $output .= storage_path('app/public/image/' . $directoryFile . '/' . $fileName . time() . '@lg' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@lg' . '.webp');
             $type .= 'large';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'md')) {
-            $output .= storage_path('app/public/image/' . $directoryFile . '/' . $fileName . time() . '@md' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@md' . '.webp');
             $type .= 'medium';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'sm')) {
-            $output .= storage_path('app/public/image/' . $directoryFile . '/' . $fileName . time() . '@sm' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@sm' . '.webp');
             $type .= 'small';
             convertToWebp($image, $output);
         } else {
-            $output .= storage_path('app/public/image/' . $directoryFile . '/' . $fileName . time() . '@tb' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@tb' . '.webp');
             $type .= 'thumbnail';
             convertToWebp($image, $output);
         }
 
         $dataImage = [
             "size" => Storage::size(substr($image, 21)),
-            "extention" => \File::extension(substr($image, 21)),
+            "extention" => File::extension(substr($image, 21)),
             "type" => $type,
             "image_url" => substr($image, 33),
         ];
 
         $dataWebp = [
             "size" => Storage::size(substr($output, 21)),
-            "extention" => \File::extension(substr($output, 21)),
+            "extention" => File::extension(substr($output, 21)),
             "type" => $type,
             "image_url" => substr($output, 33),
         ];
@@ -226,12 +226,170 @@ function resizeImage($directoryFile, $imageNameWithExtension, $fileName)
     return $imageDetails;
 }
 
+function resizeImageOriginal($directory, $imageNameWithExtension, $fileName)
+{
+    $optimizerChain = (new OptimizerChain)
+        ->addOptimizer(new Jpegoptim([
+            '-m85',
+            '--strip-all',
+            '--all-progressive',
+        ]))
+        ->addOptimizer(new Pngquant([
+            '--force',
+        ]))
+        ->addOptimizer(new Optipng([
+            '-i0',
+            '-o2',
+            '-quiet',
+        ]))
+        ->addOptimizer(new Svgo([
+            '--disable=cleanupIDs',
+        ]))
+        ->addOptimizer(new Gifsicle([
+            '-b',
+            '-O3'
+        ]))
+        ->addOptimizer(new Cwebp([
+            '-m 6',
+            '-pass 10',
+            '-mt',
+            '-q 90',
+        ]));
+
+    $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
+    $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
+    $images = $multiSizeImage->processImage($pathFile);
+    $imageDetails = array();
+
+    foreach ($images as $image) {
+        $imageNameWithExtention = substr($image, 33);
+        $type = '';
+
+        if (str_contains($imageNameWithExtention, 'lg')) {
+            $type .= 'large';
+        } else if (str_contains($imageNameWithExtention, 'md')) {
+            $type .= 'medium';
+        } else if (str_contains($imageNameWithExtention, 'sm')) {
+            $type .= 'small';
+        } else {
+            $type .= 'thumbnail';
+        }
+
+        $dataImage = [
+            "size" => Storage::size(substr($image, 21)),
+            "extention" => File::extension(substr($image, 21)),
+            "type" => $type,
+            "image_url" => substr($image, 33),
+        ];
+
+        $dataImage = [
+            "image" => $dataImage
+        ];
+
+        $imageDetails = [$dataImage, ...$imageDetails];
+    }
+
+    return $imageDetails;
+}
+
+function resizeImageToWebp($directory, $imageNameWithExtension, $fileName)
+{
+    $optimizerChain = (new OptimizerChain)
+        ->addOptimizer(new Jpegoptim([
+            '-m85',
+            '--strip-all',
+            '--all-progressive',
+        ]))
+        ->addOptimizer(new Pngquant([
+            '--force',
+        ]))
+        ->addOptimizer(new Optipng([
+            '-i0',
+            '-o2',
+            '-quiet',
+        ]))
+        ->addOptimizer(new Svgo([
+            '--disable=cleanupIDs',
+        ]))
+        ->addOptimizer(new Gifsicle([
+            '-b',
+            '-O3'
+        ]))
+        ->addOptimizer(new Cwebp([
+            '-m 6',
+            '-pass 10',
+            '-mt',
+            '-q 90',
+        ]));
+
+    $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
+    $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
+    $images = $multiSizeImage->processImage($pathFile);
+    $imageDetails = array();
+
+    foreach ($images as $image) {
+        $imageNameWithExtention = substr($image, 33);
+        $output = '';
+        $type = '';
+
+        if (str_contains($imageNameWithExtention, 'lg')) {
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@lg' . '.webp');
+            $type .= 'large';
+            convertToWebp($image, $output);
+        } else if (str_contains($imageNameWithExtention, 'md')) {
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@md' . '.webp');
+            $type .= 'medium';
+            convertToWebp($image, $output);
+        } else if (str_contains($imageNameWithExtention, 'sm')) {
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@sm' . '.webp');
+            $type .= 'small';
+            convertToWebp($image, $output);
+        } else {
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@tb' . '.webp');
+            $type .= 'thumbnail';
+            convertToWebp($image, $output);
+        }
+
+        $dataImage = [
+            "size" => Storage::size(substr($image, 21)),
+            "extention" => File::extension(substr($image, 21)),
+            "type" => $type,
+            "image_url" => substr($image, 33),
+        ];
+
+        $dataWebp = [
+            "size" => Storage::size(substr($output, 21)),
+            "extention" => File::extension(substr($output, 21)),
+            "type" => $type,
+            "image_url" => substr($output, 33),
+        ];
+
+        $dataImage = [
+            "webp" => $dataWebp
+        ];
+
+        $imageDetails = [$dataImage, ...$imageDetails];
+    }
+
+    return $imageDetails;
+}
+
 function uploadToGoogleStorage($image_path, $filename)
 {
-    $disk = \Storage::disk('gcs');
+    $disk = Storage::disk('gcs');
     $fileSource = fopen($image_path, 'r');
     $result = $disk->write($filename, $fileSource);
     return $result;
+}
+
+function uploadToS3Bucket($file_path, $file)
+{
+    if (File::exists($file)) {
+        $fileSource = fopen($file, 'r+');
+        Storage::disk('s3')->put($file_path, $fileSource);
+        $pathURL = Storage::disk('s3')->url($file_path);
+        return $pathURL;
+    }
 }
 
 function convertToWebp($input, $output)
