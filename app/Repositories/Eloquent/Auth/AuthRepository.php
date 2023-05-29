@@ -227,8 +227,6 @@ class AuthRepository implements AuthRepositoryInterface
                 }
             }
         } else {
-            dump("first_time_loginss");
-            dump(md5($password) == $user_access[0]->password);
             if (md5($password) == $user_access[0]->password) {
                 $tbl_user_auth = User::where("email", $users->email)->get();
 
@@ -297,6 +295,8 @@ class AuthRepository implements AuthRepositoryInterface
                 }
             } else {
                 $tbl_user_auth = User::where("email", $users->email)->get();
+                dump("count");
+                dump($tbl_user_auth->count() == 0);
 
                 if ($tbl_user_auth->count() == 0) {
                     $check_phone1 = empty($users->mobile_phone1) || is_null($users->mobile_phone1);
@@ -334,18 +334,14 @@ class AuthRepository implements AuthRepositoryInterface
                         }
                     }
                 } else {
-                    if ($tbl_user_auth->first()->device_id == "Website") {
-                        $user_create = User::updateOrCreate([
-                            'email'   => $request['email'],
-                        ], [
-                            "device_id" => $request->device_id,
-                        ]);
-
-                        if ($user_create->device_id == $request->device_id) {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
+                    dump("device_id");
+                    dump($request->device_id == "Website");
+                    if ($request->device_id == "Website") {
+                        if ($tbl_user_auth->first()->device_id == $request->device_id) {
+                            $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
                             return $this->apiController->trueResult("Selamat datang kembali", $data);
                         } else if ($request->device_id == "Website") {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
+                            $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
                             return $this->apiController->trueResult("Selamat datang kembali", $data);
                         } else {
                             return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
