@@ -227,7 +227,7 @@ class AuthRepository implements AuthRepositoryInterface
                 }
             }
         } else {
-            dump("first_time_login");
+            dump("first_time_loginss");
             dump(md5($password) == $user_access[0]->password);
             if (md5($password) == $user_access[0]->password) {
                 $tbl_user_auth = User::where("email", $users->email)->get();
