@@ -295,8 +295,6 @@ class AuthRepository implements AuthRepositoryInterface
                 }
             } else {
                 $tbl_user_auth = User::where("email", $users->email)->get();
-                dump("count");
-                dump($tbl_user_auth->count() == 0);
 
                 if ($tbl_user_auth->count() == 0) {
                     $check_phone1 = empty($users->mobile_phone1) || is_null($users->mobile_phone1);
@@ -334,8 +332,6 @@ class AuthRepository implements AuthRepositoryInterface
                         }
                     }
                 } else {
-                    dump("device_id");
-                    dump($request->device_id == "Website");
                     if ($request->device_id == "Website") {
                         if ($tbl_user_auth->first()->device_id == $request->device_id) {
                             $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
