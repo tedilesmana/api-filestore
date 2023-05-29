@@ -107,7 +107,12 @@ class AuthRepository implements AuthRepositoryInterface
 
         $first_time_login = count($user_access) == 0;
 
+        dump("first_time_login");
+        dump($first_time_login);
+
         if ($first_time_login) {
+            dump("password");
+            dump($password == $users->tgl_lahir);
             if ($password == $users->tgl_lahir) {
                 $tbl_user_auth = User::where("email", $users->email)->get();
 
