@@ -74,7 +74,8 @@ class AuthRepository implements AuthRepositoryInterface
         $user_detail['periode_id'] = $request["periode_id"];
         $user_detail['is_active'] = $request["is_active"];
         $user_detail['level'] = $request["level"];
-        $user_detail['departement_id'] = $request["departement"];
+        // $user_detail['departement_id'] = $request["departement"];
+        $user_detail['departement_id'] = $request["direktorat"];
         $user_detail['direktorat_id'] = $request["direktorat"];
 
         Lecturer::updateOrCreate([
