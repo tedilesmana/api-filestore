@@ -75,6 +75,7 @@ class AuthRepository implements AuthRepositoryInterface
         $user_detail['is_active'] = $request["is_active"];
         $user_detail['level'] = $request["level"];
         $user_detail['departement_id'] = $request["departement"];
+        $user_detail['direktorat_id'] = $request["direktorat"];
 
         Lecturer::updateOrCreate([
             'user_id'   => $user->id,
@@ -90,7 +91,7 @@ class AuthRepository implements AuthRepositoryInterface
         $email = $username . '@paramadina.ac.id';
 
         $sql_users = "SELECT A.id, A.email, A.phone, A.mobile_phone1, A.mobile_phone2, A.nama, A.inisial, A.tgl_lahir, A.isActive, B.track_jabatan_struktural as id_jabatan,
-							B.track_department as id_depart
+							B.track_department as id_depart, B.direktorat as id_direktorat
 							FROM tbl_master_personal A
 							LEFT JOIN hrd_personal_track_jbtn_struktural B ON A.personal_uid = B.refkey AND B.isActive = 1
 							LEFT JOIN tbl_master_jabatan C ON B.track_jabatan_struktural = C.acajbt_uid
@@ -134,6 +135,7 @@ class AuthRepository implements AuthRepositoryInterface
                             "is_active" => $users->isActive,
                             "level" => $users->id_jabatan,
                             "departement" => $users->id_depart,
+                            "direktorat" => $users->id_direktorat,
                         ]);
                         if ($user_create->device_id == $request->device_id) {
                             $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
@@ -213,6 +215,7 @@ class AuthRepository implements AuthRepositoryInterface
                             "is_active" => $users->isActive,
                             "level" => $users->id_jabatan,
                             "departement" => $users->id_depart,
+                            "direktorat" => $users->id_direktorat,
                         ]);
                         if ($user_create->device_id == $request->device_id) {
                             $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
@@ -253,6 +256,7 @@ class AuthRepository implements AuthRepositoryInterface
                             "is_active" => $users->isActive,
                             "level" => $users->id_jabatan,
                             "departement" => $users->id_depart,
+                            "direktorat" => $users->id_direktorat,
                         ]);
                         if ($user_create->device_id == $request->device_id) {
                             $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
@@ -319,6 +323,7 @@ class AuthRepository implements AuthRepositoryInterface
                             "is_active" => $users->isActive,
                             "level" => $users->id_jabatan,
                             "departement" => $users->id_depart,
+                            "direktorat" => $users->id_direktorat,
                         ]);
 
                         if ($user_create->device_id == $request->device_id) {
