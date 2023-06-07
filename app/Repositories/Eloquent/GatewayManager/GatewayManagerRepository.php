@@ -8,6 +8,7 @@ use App\Models\Feature;
 use App\Models\Module;
 use App\Repositories\Interfaces\GatewayManager\GatewayManagerRepositoryInterface;
 use App\Services\MessageGatewayService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -70,6 +71,8 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             $input = $request->all();
             $input["slug"] = Str::slug($request->name);
             $input["payload"] = json_encode($request->payload);
+            $input["created_at"] = Carbon::now();
+            $input["updated_at"] = Carbon::now();
             $listIds = $request->ids ?? [];
             $ids = '';
             for ($i = 0; $i < count($listIds); $i++) {
@@ -91,22 +94,70 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         $featureItem = DB::table("features")->where("slug", $feature)->first();
 
         if ($action == "detail") {
-            $requestItem = DB::table($app)->where("slug", $title)->first();
+            $requestItem = DB::table($app)
+                ->leftJoin('applications', function ($join)  use ($app) {
+                    $join->on('applications.id', '=', $app . '.application_id');
+                })
+                ->leftJoin('modules', function ($join)  use ($app) {
+                    $join->on('modules.id', '=', $app . '.module_id');
+                })
+                ->leftJoin('features', function ($join)  use ($app) {
+                    $join->on('features.id', '=', $app . '.feature_id');
+                })
+                ->where($app . ".slug", $title)
+                ->select($app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
+                ->first();
             return $this->apiController->trueResult("Detail request berhasil di ambil", $requestItem);
         }
 
         if ($action == "by_application_id") {
-            $listByAppId = DB::table($app)->where("application_id", $applicationItem->id)->get();
+            $listByAppId = DB::table($app)
+                ->leftJoin('applications', function ($join)  use ($app) {
+                    $join->on('applications.id', '=', $app . '.application_id');
+                })
+                ->leftJoin('modules', function ($join)  use ($app) {
+                    $join->on('modules.id', '=', $app . '.module_id');
+                })
+                ->leftJoin('features', function ($join)  use ($app) {
+                    $join->on('features.id', '=', $app . '.feature_id');
+                })
+                ->where("applications.id", $applicationItem->id)
+                ->select($app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
+                ->get();
             return $this->apiController->trueResult("Data request by applikasi berhasil di ambil", $listByAppId);
         }
 
         if ($action == "by_module_id") {
-            $listByModuleId = DB::table($app)->where("module_id", $moduleItem->id)->get();
+            $listByModuleId = DB::table($app)
+                ->leftJoin('applications', function ($join)  use ($app) {
+                    $join->on('applications.id', '=', $app . '.application_id');
+                })
+                ->leftJoin('modules', function ($join)  use ($app) {
+                    $join->on('modules.id', '=', $app . '.module_id');
+                })
+                ->leftJoin('features', function ($join)  use ($app) {
+                    $join->on('features.id', '=', $app . '.feature_id');
+                })
+                ->where("modules.id", $moduleItem->id)
+                ->select($app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
+                ->get();
             return $this->apiController->trueResult("Data request by module berhasil di ambil", $listByModuleId);
         }
 
         if ($action == "by_feature_id") {
-            $listByFeatureId = DB::table($app)->where("feature_id", $featureItem->id)->get();
+            $listByFeatureId = DB::table($app)
+                ->leftJoin('applications', function ($join)  use ($app) {
+                    $join->on('applications.id', '=', $app . '.application_id');
+                })
+                ->leftJoin('modules', function ($join)  use ($app) {
+                    $join->on('modules.id', '=', $app . '.module_id');
+                })
+                ->leftJoin('features', function ($join)  use ($app) {
+                    $join->on('features.id', '=', $app . '.feature_id');
+                })
+                ->where("features.id", $featureItem->id)
+                ->select($app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
+                ->get();
             return $this->apiController->trueResult("Detail request by feature berhasil di ambil", $listByFeatureId);
         }
 
@@ -126,6 +177,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             }
             $input["link_api_gateway"] = "{$base_url}/api/gateway-manager/{$applicationItem->slug}/{$moduleItem->slug}/{$featureItem->slug}/{$input["slug"]}" . $ids;
             $input["payload"] = json_encode($request->payload);
+            $input["updated_at"] = Carbon::now();
             unset($input["ids"]);
 
             $updateItem = DB::table($app)->where("slug", $title)->update($input);
