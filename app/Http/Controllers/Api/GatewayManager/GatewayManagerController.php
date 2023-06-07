@@ -45,16 +45,6 @@ class GatewayManagerController extends BaseController
      */
     public function store(Request $request)
     {
-        try {
-            $response = $this->gatewayManagerRepository->create($request);
-            if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
-            } else {
-                return $this->errorResponse($response->message, $response->data);
-            }
-        } catch (\Exception $e) {
-            return $this->badResponse($e->getMessage(), null);
-        }
     }
 
     /**
@@ -102,15 +92,190 @@ class GatewayManagerController extends BaseController
         //
     }
 
-    public function proceedRequest($app, $module, $feature, $title)
+    public function postRequest($app, $module, $feature, $title, Request $request)
     {
         try {
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
-            $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data);
-            if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
+            if ($result->data->methode == "post") {
+                $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request);
+                if ($response->success) {
+                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                } else {
+                    return $this->errorResponse($response->message, $response->data);
+                }
             } else {
-                return $this->errorResponse($response->message, $response->data);
+                return $this->errorResponse("Methode not allow", null);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    public function getRequest($app, $module, $feature, $title, Request $request)
+    {
+        try {
+            $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
+            if ($result->data->methode == "get") {
+                $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request);
+                if ($response->success) {
+                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                } else {
+                    return $this->errorResponse($response->message, $response->data);
+                }
+            } else {
+                return $this->errorResponse("Methode not allow", null);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    public function postRequestOneId($app, $module, $feature, $title, $id, Request $request)
+    {
+        try {
+            $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
+            if ($result->data->methode == "post") {
+                $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id);
+                if ($response->success) {
+                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                } else {
+                    return $this->errorResponse($response->message, $response->data);
+                }
+            } else {
+                return $this->errorResponse("Methode not allow", null);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    public function putRequestOneId($app, $module, $feature, $title, $id, Request $request)
+    {
+        try {
+            $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
+            if ($result->data->methode == "put") {
+                $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id);
+                if ($response->success) {
+                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                } else {
+                    return $this->errorResponse($response->message, $response->data);
+                }
+            } else {
+                return $this->errorResponse("Methode not allow", null);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    public function deleteRequestOneId($app, $module, $feature, $title, $id, Request $request)
+    {
+        try {
+            $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
+            if ($result->data->methode == "delete") {
+                $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id);
+                if ($response->success) {
+                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                } else {
+                    return $this->errorResponse($response->message, $response->data);
+                }
+            } else {
+                return $this->errorResponse("Methode not allow", null);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    public function getRequestOneId($app, $module, $feature, $title, $id, Request $request)
+    {
+        try {
+            $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
+            if ($result->data->methode == "get") {
+                $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id);
+                if ($response->success) {
+                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                } else {
+                    return $this->errorResponse($response->message, $response->data);
+                }
+            } else {
+                return $this->errorResponse("Methode not allow", null);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    public function postRequestTwoId($app, $module, $feature, $title, $id, $idTwo, Request $request)
+    {
+        try {
+            $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
+            if ($result->data->methode == "post") {
+                $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id, "/" . $idTwo);
+                if ($response->success) {
+                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                } else {
+                    return $this->errorResponse($response->message, $response->data);
+                }
+            } else {
+                return $this->errorResponse("Methode not allow", null);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    public function putRequestTwoId($app, $module, $feature, $title, $id, $idTwo, Request $request)
+    {
+        try {
+            $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
+            if ($result->data->methode == "put") {
+                $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id, "/" . $idTwo);
+                if ($response->success) {
+                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                } else {
+                    return $this->errorResponse($response->message, $response->data);
+                }
+            } else {
+                return $this->errorResponse("Methode not allow", null);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    public function deleteRequestTwoId($app, $module, $feature, $title, $id, $idTwo, Request $request)
+    {
+        try {
+            $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
+            if ($result->data->methode == "delete") {
+                $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id, "/" . $idTwo);
+                if ($response->success) {
+                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                } else {
+                    return $this->errorResponse($response->message, $response->data);
+                }
+            } else {
+                return $this->errorResponse("Methode not allow", null);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    public function getRequestTwoId($app, $module, $feature, $title, $id, $idTwo, Request $request)
+    {
+        try {
+            $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
+            if ($result->data->methode == "get") {
+                $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id, "/" . $idTwo);
+                if ($response->success) {
+                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                } else {
+                    return $this->errorResponse($response->message, $response->data);
+                }
+            } else {
+                return $this->errorResponse("Methode not allow", null);
             }
         } catch (\Exception $e) {
             return $this->badResponse($e->getMessage(), null);
@@ -122,7 +287,21 @@ class GatewayManagerController extends BaseController
         try {
             $response = $this->gatewayManagerRepository->updateRequest($app, $module, $feature, $title, $action, $request);
             if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
+                return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    public function addRequest(Request $request)
+    {
+        try {
+            $response = $this->gatewayManagerRepository->create($request);
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
             } else {
                 return $this->errorResponse($response->message, $response->data);
             }

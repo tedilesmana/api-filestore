@@ -6,12 +6,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 trait ApiResponser
 {
-    public function successResponse($message, $data)
+    public function successResponse($message, $data, $pagination = null)
     {
         return response()->json([
             'success' => true,
             'message' => $message,
             'data' => $data,
+            'pagination' => $pagination,
         ], Response::HTTP_OK)->header('Content-Type', 'application/json');
     }
 

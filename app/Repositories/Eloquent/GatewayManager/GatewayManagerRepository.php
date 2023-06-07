@@ -69,8 +69,14 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             $base_url = env('APP_URL');
             $input = $request->all();
             $input["slug"] = Str::slug($request->name);
-            $input["link_api_gateway"] = "{$base_url}/api/gateway-manager/{$application->slug}/{$module->slug}/{$feature->slug}/{$input["slug"]}";
-
+            $input["payload"] = json_encode($request->payload);
+            $listIds = $request->ids ?? [];
+            $ids = '';
+            for ($i = 0; $i < count($listIds); $i++) {
+                $ids = $ids . '/' . $listIds[$i];
+            }
+            $input["link_api_gateway"] = "{$base_url}/api/gateway-manager/{$application->slug}/{$module->slug}/{$feature->slug}/{$input["slug"]}" . $ids;
+            unset($input["ids"]);
             $result = DB::table($application->slug)->insert(
                 $input
             );
@@ -82,7 +88,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
     {
         $applicationItem = DB::table("applications")->where("slug", $app)->first();
         $moduleItem = DB::table("modules")->where("slug", $module)->first();
-        $featureItem = DB::table("applications")->where("slug", $feature)->first();
+        $featureItem = DB::table("features")->where("slug", $feature)->first();
 
         if ($action == "detail") {
             $requestItem = DB::table($app)->where("slug", $title)->first();
@@ -110,7 +116,19 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         }
 
         if ($action == "update") {
-            $updateItem = DB::table($app)->where("slug", $title)->update($request->all());
+            $base_url = env('APP_URL');
+            $input = $request->all();
+            $input["slug"] = Str::slug($request->name);
+            $listIds = $request->ids ?? [];
+            $ids = '';
+            for ($i = 0; $i < count($listIds); $i++) {
+                $ids = $ids . '/' . $listIds[$i];
+            }
+            $input["link_api_gateway"] = "{$base_url}/api/gateway-manager/{$applicationItem->slug}/{$moduleItem->slug}/{$featureItem->slug}/{$input["slug"]}" . $ids;
+            $input["payload"] = json_encode($request->payload);
+            unset($input["ids"]);
+
+            $updateItem = DB::table($app)->where("slug", $title)->update($input);
             return $this->apiController->trueResult("Update request berhasil di lakukan", $updateItem);
         }
     }

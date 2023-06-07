@@ -3,7 +3,9 @@
 namespace App\Traits;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
+use Psr\Http\Message\ResponseInterface;
 
 trait GlobalExternalService
 {
@@ -12,7 +14,7 @@ trait GlobalExternalService
      * @return string
      */
 
-    public function performeRequest($method, $requestUrl, $token, $form_params = [], $headers = [])
+    public function performeRequest($method, $requestUrl, $token, $body = [], $headers = [], $params = '')
     {
         $client = new Client();
 
@@ -20,8 +22,8 @@ trait GlobalExternalService
             $headers["Authorization"] = $token;
         }
 
-        $request = new Request($method, $requestUrl, $headers);
-        $response = $client->sendAsync($request,  $form_params)->wait();
+        $request = new Request($method, $requestUrl . $params, $headers);
+        $response = $client->sendAsync($request,  $body)->wait();
         return json_decode($response->getBody()->getContents());
     }
 }

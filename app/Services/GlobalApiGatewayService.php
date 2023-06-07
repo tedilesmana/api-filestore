@@ -8,8 +8,26 @@ class GlobalApiGatewayService
 {
     use GlobalExternalService;
 
-    public function globalApiGatewayService($request)
+    public function globalApiGatewayService($result, $request, $id = "", $idTwo = "")
     {
-        return $this->performeRequest($request->methode, $request->link_api_application, $request->token);
+        $params = '';
+        $multipart = [];
+        foreach ($request->all() as $key => $value) {
+            if (strlen($params) == 0) {
+                $params = '?' . $key . '=' . $value ?? '';
+            } else {
+                $params = $params . '&' . $key . '=' . $value ?? '';
+            }
+            $multipart = [...$multipart, [
+                'name' => $key,
+                'contents' => $value
+            ]];
+        }
+
+        // $body = [
+        //     'multipart' => $multipart
+        // ];
+
+        return $this->performeRequest($result->methode, $result->link_api_application . $id . $idTwo, $result->token, [], [], $params);
     }
 }
