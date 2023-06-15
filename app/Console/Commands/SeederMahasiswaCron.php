@@ -51,6 +51,7 @@ class SeederMahasiswaCron extends Command
                 if ($response->success) {
                     $log_seeder = [];
                     $log_seeder['name'] = 'students';
+                    $log_seeder['jumlah_data'] = $response->data;
                     $log_seeder['current_page'] = $logSeeder->current_page + 1;
 
                     LogSeeder::updateOrCreate([
@@ -68,6 +69,7 @@ class SeederMahasiswaCron extends Command
                 if ($response->success) {
                     $log_seeder = [];
                     $log_seeder['name'] = 'students';
+                    $log_seeder['jumlah_data'] = $response->data;
                     $log_seeder['current_page'] = 1;
 
                     LogSeeder::updateOrCreate([

@@ -174,9 +174,11 @@ class SeederDbRepository implements SeederDbRepositoryInterface
                     $lecture['nidn'] = $value->NIDN;
                     $lecture['source_employee_id'] = $value->id;
                     $lecture['is_active'] = $value->isActive == 1 && $value->erased == 0 ? 1 : 0;
-                    $lecture['level'] = $value->id_jabatan;
+                    $lecture['jabatan_id'] = $value->id_jabatan;
                     $lecture['departement_id'] = $value->id_depart;
                     $lecture['direktorat_id'] = $value->id_direktorat;
+                    $lecture['rektorat_id'] = $value->id_rektorat;
+                    $lecture['personal_uid'] = $value->personal_uid;
 
                     Employee::updateOrCreate([
                         'user_id'   => $user->id,

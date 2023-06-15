@@ -22,8 +22,11 @@ class CreateEmployeesTable extends Migration
             $table->dateTime('entry_year')->nullable();
             $table->dateTime('out_year')->nullable();
             $table->bigInteger('source_employee_id');
-            $table->integer('departement_id');
-            $table->integer('level')->nullable();
+            $table->bigInteger('departement_id')->nullable();
+            $table->bigInteger('direktorat_id')->nullable();
+            $table->bigInteger('rektorat_id')->nullable();
+            $table->string('personal_uid')->nullable();
+            $table->bigInteger('jabatan_id')->nullable();
             $table->integer('is_active')->nullable();
             $table->char('initial', 35)->nullable();
             $table->char('nidn', 35)->nullable();

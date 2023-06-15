@@ -16,6 +16,7 @@ class CreateLogSeedersTable extends Migration
         Schema::create('log_seeders', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->integer('jumlah_data')->nullable();
             $table->string('current_page');
             $table->timestamps();
         });
