@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateModulesTable extends Migration
+class CreateLogSeedersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,10 @@ class CreateModulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('modules', function (Blueprint $table) {
+        Schema::create('log_seeders', function (Blueprint $table) {
             $table->id();
-            $table->char('module_code', 35)->unique();
-            $table->foreignId('application_id')->constrained()
-                ->onUpdate('restrict')
-                ->onDelete('restrict');
             $table->string('name')->unique();
-            $table->string('description');
-            $table->string('slug');
+            $table->string('current_page');
             $table->timestamps();
         });
     }
@@ -33,6 +28,6 @@ class CreateModulesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('modules');
+        Schema::dropIfExists('log_seeders');
     }
 }

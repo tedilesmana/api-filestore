@@ -70,8 +70,8 @@ class User extends Authenticatable
         return $this->hasOne(UserDetail::class);
     }
 
-    public function lecturer()
+    public function employee()
     {
-        return $this->hasOne(Lecturer::class);
+        return $this->hasOne(Employee::class);
     }
 }

@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Lecturer extends Model
+class Student extends Model
 {
     use HasFactory;
+    const CODE = 'A1-STUDN';
     protected $guarded = array('id');
 }

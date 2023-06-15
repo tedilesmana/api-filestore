@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Hris\MasterLocationController;
 use App\Http\Controllers\Api\Hris\PresensiController;
 use App\Http\Controllers\Api\Hris\SettingController;
 use App\Http\Controllers\Api\Hris\WorkingShiftController;
+use App\Http\Controllers\Api\Seeder\SeederDbController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,6 +23,10 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 | 
 */
+
+Route::post('seeder-insert-mhs', [SeederDbController::class, 'insertMahasiswa']);
+Route::post('seeder-insert-staff', [SeederDbController::class, 'insertEmployees']);
+Route::post('seeder-insert-staff-dlb', [SeederDbController::class, 'insertDlbEmployees']);
 
 Route::post('auth/login-by-whatsapp', [AuthController::class, 'loginWithWhatsApp']);
 Route::post('auth/login-by-google', [AuthController::class, 'login']);

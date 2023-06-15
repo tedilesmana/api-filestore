@@ -15,6 +15,7 @@ class CreateApplicationsTable extends Migration
     {
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
+            $table->char('application_code', 35)->unique();
             $table->string('name')->unique();
             $table->string('description');
             $table->string('base_url');

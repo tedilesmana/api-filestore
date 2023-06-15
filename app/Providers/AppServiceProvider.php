@@ -20,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
             'GatewayModule',
             'GatewayFeature',
             'GatewayManager',
+            'SeederDb',
         );
 
         foreach ($models as $model) {

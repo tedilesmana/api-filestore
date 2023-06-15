@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUserDetailsTable extends Migration
+class CreateDlbEmployeesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,18 @@ class CreateUserDetailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_details', function (Blueprint $table) {
+        Schema::create('dlb_employees', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()
                 ->onUpdate('restrict')
                 ->onDelete('restrict');
-            $table->date('tanggal_lahir')->nullable();
-            $table->string('tempat_lahir')->nullable();
-            $table->enum('jenis_kelamin', ["L", "P"])->default(null)->nullable();
-            $table->string('alamat')->nullable();
-            $table->string('agama')->nullable();
-            $table->string('kode_pos')->nullable();
-            $table->string('nik_ktp')->nullable();
+            $table->char('dlb_employee_code', 35)->unique();
+            $table->bigInteger('source_dlb_employee_id');
+            $table->string('staff_id')->nullable();
+            $table->integer('is_active')->nullable();
+            $table->integer('program_studi')->nullable();
+            $table->char('initial', 35)->nullable();
+            $table->char('nidn', 35)->nullable();
             $table->timestamps();
         });
     }
@@ -36,6 +36,6 @@ class CreateUserDetailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_details');
+        Schema::dropIfExists('dlb_employees');
     }
 }

@@ -24,12 +24,12 @@ class PresensiService
 
     public function getAllPresensiByUserService($request)
     {
-        return $this->performeRequest("GET", "/presensi?personal_id=" . Auth::user()->lecturer->lecturer_id . "&page=" . $request->page);
+        return $this->performeRequest("GET", "/presensi?personal_id=" . Auth::user()->employee->source_employee_id . "&page=" . $request->page);
     }
 
     public function getAllPresensiByDepartementService($id)
     {
-        return $this->performeRequest("GET", "/presensi/" . $id . "?personal_id=" . Auth::user()->lecturer->lecturer_id . "&department_id=" . Auth::user()->lecturer->departement_id);
+        return $this->performeRequest("GET", "/presensi/" . $id . "?personal_id=" . Auth::user()->employee->source_employee_id . "&department_id=" . Auth::user()->employee->departement_id);
     }
 
     public function doPresensiCheckInCheckOutService($request)
@@ -51,11 +51,11 @@ class PresensiService
                 ],
                 [
                     'name' => 'personal_id',
-                    'contents' => Auth::user()->lecturer->lecturer_id
+                    'contents' => Auth::user()->employee->source_employee_id
                 ],
                 [
                     'name' => 'departement',
-                    'contents' => Auth::user()->lecturer->departement_id
+                    'contents' => Auth::user()->employee->departement_id
                 ],
                 [
                     'name' => 'in_longitude',

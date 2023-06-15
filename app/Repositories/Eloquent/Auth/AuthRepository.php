@@ -5,7 +5,7 @@ namespace App\Repositories\Eloquent\Auth;
 use App\Models\User;
 use App\Http\Controllers\BaseController;
 use App\Http\Resources\User\UserResource;
-use App\Models\Lecturer;
+use App\Models\Employee;
 use App\Models\UserDetail;
 use App\Repositories\Interfaces\Auth\AuthRepositoryInterface;
 use App\Services\MessageGatewayService;
@@ -56,317 +56,97 @@ class AuthRepository implements AuthRepositoryInterface
             'email'   => $request['email'],
         ], $input);
 
-        $lecture = [];
-        $lecture['user_id'] = $user->id;
-        $lecture['lecturer_id'] = $request["personal_id"];
-        $lecture['periode_id'] = $request["periode_id"];
-        $lecture['is_active'] = $request["is_active"];
-        $lecture['level'] = $request["level"];
-        $lecture['departement_id'] = $request["departement"];
+        $user_detail = [];
+        $user_detail['user_id'] = $user->id;
 
         UserDetail::updateOrCreate([
             'user_id'   => $user->id,
-        ], $lecture);
-
-        $user_detail = [];
-        $user_detail['user_id'] = $user->id;
-        $user_detail['lecturer_id'] = $request["personal_id"];
-        $user_detail['periode_id'] = $request["periode_id"];
-        $user_detail['is_active'] = $request["is_active"];
-        $user_detail['level'] = $request["level"];
-        // $user_detail['departement_id'] = $request["departement"];
-        $user_detail['departement_id'] = $request["direktorat"];
-        $user_detail['direktorat_id'] = $request["direktorat"];
-
-        Lecturer::updateOrCreate([
-            'user_id'   => $user->id,
         ], $user_detail);
+
+        $latestDataEmployee = Employee::orderBy('id', 'desc')->latest()->first();
+        $codeEmployee = generateCode($latestDataEmployee !== null ? $latestDataEmployee->employee_code : null, Employee::CODE);
+
+        $lecture = [];
+        $lecture['user_id'] = $user->id;
+        $lecture['employee_code'] = $codeEmployee;
+        $lecture['entry_year'] = null;
+        $lecture['out_year'] = null;
+        $lecture['inisial'] = null;
+        $lecture['nidn'] = null;
+        $lecture['source_employee_id'] = $request["personal_id"];
+        $lecture['is_active'] = $request["is_active"];
+        $lecture['level'] = $request["level"];
+        $lecture['departement_id'] = $request["departement"];
+        $lecture['direktorat_id'] = $request["direktorat"];
+
+        Employee::updateOrCreate([
+            'user_id'   => $user->id,
+        ], $lecture);
 
         return $user;
     }
 
     public function login($request)
     {
-        $username = $request->username;
         $password = $request->password;
-        $email = $username . '@paramadina.ac.id';
 
-        $sql_users = "SELECT A.id, A.email, A.phone, A.mobile_phone1, A.mobile_phone2, A.nama, A.inisial, A.tgl_lahir, A.isActive, B.track_jabatan_struktural as id_jabatan,
-							B.track_department as id_depart, B.direktorat as id_direktorat
-							FROM tbl_master_personal A
-							LEFT JOIN hrd_personal_track_jbtn_struktural B ON A.personal_uid = B.refkey AND B.isActive = 1
-							LEFT JOIN tbl_master_jabatan C ON B.track_jabatan_struktural = C.acajbt_uid
-							WHERE A.email = '$email' AND A.isActive = 1 AND A.erased = 0 order by id_jabatan ;";
-        $sql_periode = 'SELECT * FROM tbl_periode_cuti WHERE isActive = 1';
+        if (str_contains($request->email, 'paramadina.ac.id')) {
+            $tbl_user_auth = User::where("email", $request->email)->first();
 
-        $users = DB::select($sql_users)[0];
-        $periode = DB::select($sql_periode)[0];
+            if (strlen(is_null($tbl_user_auth->device_id) ? "" : $tbl_user_auth->device_id) == 0) {
+                $input = [];
+                $input['device_id'] = $request->device_id;
 
-        $id = $users->id;
+                $tbl_user_auth = User::updateOrCreate([
+                    'email'   => $request['email'],
+                ], $input);
+            }
 
-        $sql_user_access = "SELECT * from tbl_user_pass where user = $id limit 1";
-        $user_access = DB::select($sql_user_access);
-
-        $first_time_login = count($user_access) == 0;
-
-        if ($first_time_login) {
-            if ($password == $users->tgl_lahir) {
-                $tbl_user_auth = User::where("email", $users->email)->get();
-
-                if ($tbl_user_auth->count() == 0) {
-                    $check_phone1 = empty($users->mobile_phone1) || is_null($users->mobile_phone1);
-                    $check_phone2 = empty($users->mobile_phone2) || is_null($users->mobile_phone2);
-                    $check_phone3 = empty($users->phone) || is_null($users->phone);
-                    $phone1 = $check_phone2 ? $check_phone3 : $check_phone2;
-                    $phone2 = $check_phone1 ? $phone1 : $check_phone1;
-
-                    if (empty($phone2) || is_null($phone2)) {
-                        return $this->apiController->falseResult("Nomor handphone kamu belum terdaftar", null);
-                    } else {
-                        $user_create = $this->register([
-                            "name" => $users->nama,
-                            "device_id" => $request->device_id,
-                            "google_id" => $request->google_id,
-                            "email" => $users->email,
-                            "email_verified_at" => Carbon::now(),
-                            "password" => $password,
-                            "phone_number" => $phone2,
-                            "personal_id" => $id,
-                            "periode_id" => $periode->id_periode,
-                            "is_active" => $users->isActive,
-                            "level" => $users->id_jabatan,
-                            "departement" => $users->id_depart,
-                            "direktorat" => $users->id_direktorat,
-                        ]);
-                        if ($user_create->device_id == $request->device_id) {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else if ($request->device_id == "Website") {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else {
-                            return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                        }
-                    }
-                } else {
-                    if ($tbl_user_auth->first()->device_id == "Website") {
-                        if ($tbl_user_auth->first()->device_id == $request->device_id) {
-                            $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else if ($request->device_id == "Website") {
-                            $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else {
-                            return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                        }
-                    }
-
-                    if ($tbl_user_auth->first()->device_id == $request->device_id) {
-                        $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
+            if ($request->login_by == "google") {
+                if ($tbl_user_auth->google_id) {
+                    if ($request->device_id == $tbl_user_auth->device_id) {
+                        $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
                         return $this->apiController->trueResult("Selamat datang kembali", $data);
                     } else if ($request->device_id == "Website") {
-                        $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
+                        $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
+                        return $this->apiController->trueResult("Selamat datang kembali", $data);
+                    } else {
+                        return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
+                    }
+                } else {
+                    $input = [];
+                    $input['google_password'] = Hash::make($password);
+                    $input['google_id'] = $request->google_id;
+                    $input['device_id'] = $request->device_id;
+
+                    $tbl_user_auth = User::updateOrCreate([
+                        'email'   => $request['email'],
+                    ], $input);
+
+                    if ($tbl_user_auth->device_id == $request->device_id) {
+                        $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
+                        return $this->apiController->trueResult("Selamat datang kembali", $data);
+                    } else if ($request->device_id == "Website") {
+                        $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
                         return $this->apiController->trueResult("Selamat datang kembali", $data);
                     } else {
                         return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
                     }
                 }
             } else {
-                $tbl_user_auth = User::where("email", $users->email)->get();
-
-                if ($tbl_user_auth->count() > 0) {
-                    if ($tbl_user_auth->first()->device_id == "Website") {
-                        if ($tbl_user_auth->first()->device_id == $request->device_id) {
-                            $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else if ($request->device_id == "Website") {
-                            $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else {
-                            return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                        }
-                    }
-
-                    if ($tbl_user_auth->first()->device_id == $request->device_id) {
-                        $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
-                        return $this->apiController->trueResult("Selamat datang kembali", $data);
-                    } else {
-                        return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                    }
+                if ($request->device_id == $tbl_user_auth->device_id) {
+                    $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
+                    return $this->apiController->trueResult("Selamat datang kembali", $data);
+                } else if ($request->device_id == "Website") {
+                    $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
+                    return $this->apiController->trueResult("Selamat datang kembali", $data);
                 } else {
-                    $check_phone1 = empty($users->mobile_phone1) || is_null($users->mobile_phone1);
-                    $phone1 = !$check_phone1 ? $users->mobile_phone1 : $users->mobile_phone2;
-                    $check_phone2 = empty($phone1) || is_null($phone1);
-                    $phone2 = !$check_phone2 ? $phone1 : $users->phone;
-                    $check_phone3 = empty($phone2) || is_null($phone2);
-
-                    if ($check_phone3) {
-                        return $this->apiController->falseResult("Nomor handphone kamu belum terdaftar", null);
-                    } else {
-                        $user_create = $this->register([
-                            "name" => $users->nama,
-                            "device_id" => $request->device_id,
-                            "google_id" => $request->google_id,
-                            "email" => $users->email,
-                            "email_verified_at" => Carbon::now(),
-                            "password" => $request->google_id,
-                            "phone_number" => $phone2,
-                            "personal_id" => $id,
-                            "periode_id" => $periode->id_periode,
-                            "is_active" => $users->isActive,
-                            "level" => $users->id_jabatan,
-                            "departement" => $users->id_depart,
-                            "direktorat" => $users->id_direktorat,
-                        ]);
-                        if ($user_create->device_id == $request->device_id) {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else if ($request->device_id == "Website") {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else {
-                            return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                        }
-                    }
+                    return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
                 }
             }
         } else {
-            if (md5($password) == $user_access[0]->password) {
-                $tbl_user_auth = User::where("email", $users->email)->get();
-
-                if ($tbl_user_auth->count() == 0) {
-                    $check_phone1 = empty($users->mobile_phone1) || is_null($users->mobile_phone1);
-                    $phone1 = !$check_phone1 ? $users->mobile_phone1 : $users->mobile_phone2;
-                    $check_phone2 = empty($phone1) || is_null($phone1);
-                    $phone2 = !$check_phone2 ? $phone1 : $users->phone;
-                    $check_phone3 = empty($phone2) || is_null($phone2);
-
-                    if ($check_phone3) {
-                        return $this->apiController->falseResult("Nomor handphone kamu belum terdaftar", null);
-                    } else {
-                        $user_create = $this->register([
-                            "name" => $users->nama,
-                            "device_id" => $request->device_id,
-                            "google_id" => $request->google_id,
-                            "email" => $users->email,
-                            "email_verified_at" => Carbon::now(),
-                            "password" => $password,
-                            "phone_number" => $phone2,
-                            "personal_id" => $id,
-                            "periode_id" => $periode->id_periode,
-                            "is_active" => $users->isActive,
-                            "level" => $users->id_jabatan,
-                            "departement" => $users->id_depart,
-                            "direktorat" => $users->id_direktorat,
-                        ]);
-                        if ($user_create->device_id == $request->device_id) {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else if ($request->device_id == "Website") {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else {
-                            return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                        }
-                    }
-                } else {
-                    if ($tbl_user_auth->first()->device_id == "Website") {
-                        $user_create = User::updateOrCreate([
-                            'email'   => $request['email'],
-                        ], [
-                            "device_id" => $request->device_id,
-                        ]);
-
-                        if ($user_create->device_id == $request->device_id) {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else if ($request->device_id == "Website") {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else {
-                            return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                        }
-                    }
-
-                    if ($tbl_user_auth->first()->device_id == $request->device_id) {
-                        $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
-                        return $this->apiController->trueResult("Selamat datang kembali", $data);
-                    } else if ($request->device_id == "Website") {
-                        $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
-                        return $this->apiController->trueResult("Selamat datang kembali", $data);
-                    } else {
-                        return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                    }
-                }
-            } else {
-                $tbl_user_auth = User::where("email", $users->email)->get();
-
-                if ($tbl_user_auth->count() == 0) {
-                    $check_phone1 = empty($users->mobile_phone1) || is_null($users->mobile_phone1);
-                    $phone1 = !$check_phone1 ? $users->mobile_phone1 : $users->mobile_phone2;
-                    $check_phone2 = empty($phone1) || is_null($phone1);
-                    $phone2 = !$check_phone2 ? $phone1 : $users->phone;
-                    $check_phone3 = empty($phone2) || is_null($phone2);
-
-                    if ($check_phone3) {
-                        return $this->apiController->falseResult("Nomor handphone kamu belum terdaftar", null);
-                    } else {
-                        $user_create = $this->register([
-                            "name" => $users->nama,
-                            "device_id" => $request->device_id,
-                            "google_id" => $request->google_id,
-                            "email" => $users->email,
-                            "email_verified_at" => Carbon::now(),
-                            "password" => $request->google_id,
-                            "phone_number" => $phone2,
-                            "personal_id" => $id,
-                            "periode_id" => $periode->id_periode,
-                            "is_active" => $users->isActive,
-                            "level" => $users->id_jabatan,
-                            "departement" => $users->id_depart,
-                            "direktorat" => $users->id_direktorat,
-                        ]);
-
-                        if ($user_create->device_id == $request->device_id) {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else if ($request->device_id == "Website") {
-                            $data = ["auth" => $this->createToken($user_create->username, $password), "user" => new UserResource($user_create)];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else {
-                            return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                        }
-                    }
-                } else {
-                    if ($request->device_id == "Website") {
-                        if ($tbl_user_auth->first()->device_id == $request->device_id) {
-                            $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else if ($request->device_id == "Website") {
-                            $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else {
-                            return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                        }
-                    }
-
-                    if (Hash::check($request->password, $tbl_user_auth->first()->user_password) || Hash::check($request->password, $tbl_user_auth->first()->google_password)) {
-                        if ($tbl_user_auth->first()->device_id == $request->device_id) {
-                            $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else if ($request->device_id == "Website") {
-                            $data = ["auth" => $this->createToken($tbl_user_auth->first()->username, $password), "user" => new UserResource($tbl_user_auth->first())];
-                            return $this->apiController->trueResult("Selamat datang kembali", $data);
-                        } else {
-                            return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                        }
-                    } else {
-                        return $this->apiController->falseResult("Password yang dimasukan salah", null);
-                    }
-                }
-            }
+            return $this->apiController->falseResult("silahkan login menggunakan email paramadina", null);
         }
-        return $this->apiController->falseResult("if kondisi tidak tervalidasi", null);
     }
 
     public function loginWithWhatsApp($request)
