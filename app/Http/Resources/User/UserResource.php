@@ -23,9 +23,9 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'name' => $this->name,
             'phone_number' => $this->phone_number,
-            'employee' => $this->employee,
-            'dlb_employee' => $this->dlbEmployee,
-            'student' => $this->student,
+            'employee' => new EmployeeResource($this->employee),
+            'dlb_employee' => new DlbEmployeeResource($this->dlbEmployee),
+            'student' => new StudentResource($this->student),
             'id_mahasiswa' => $id_mahasiswa
         ];
     }

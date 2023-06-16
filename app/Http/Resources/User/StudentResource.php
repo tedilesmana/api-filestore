@@ -20,7 +20,8 @@ class StudentResource extends JsonResource
             'tanggal_lulus' => $this->tanggal_lulus,
             'angkatan' => $this->angkatan,
             'semester_masuk' => $this->semester_masuk,
-            'status' => $this->status
+            'status' => $this->status,
+            'nama' => is_null($this->mahasiswa) ? null : $this->mahasiswa->nama,
         ];
     }
 }
