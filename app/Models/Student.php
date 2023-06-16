@@ -10,4 +10,9 @@ class Student extends Model
     use HasFactory;
     const CODE = 'A1-STUDN';
     protected $guarded = array('id');
+
+    public function mahasiswa()
+    {
+        return $this->belongsTo(NewAsikMahasiswa::class,  'nim', 'nim');
+    }
 }

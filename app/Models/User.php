@@ -74,4 +74,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(Employee::class);
     }
+
+    public function dlbEmployee()
+    {
+        return $this->hasOne(DlbEmployee::class);
+    }
+
+    public function student()
+    {
+        return $this->hasOne(Student::class);
+    }
 }
