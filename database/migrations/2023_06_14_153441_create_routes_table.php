@@ -16,15 +16,12 @@ class CreateRoutesTable extends Migration
         Schema::create('routes', function (Blueprint $table) {
             $table->id();
             $table->char('route_code', 35)->unique();
-            $table->foreignId('menu_id')->constrained()
-                ->onUpdate('restrict')
-                ->onDelete('restrict');
-            $table->foreignId('sub_menu_id')->constrained()
-                ->onUpdate('restrict')
-                ->onDelete('restrict');
-            $table->foreignId('additional_menu_id')->constrained()
-                ->onUpdate('restrict')
-                ->onDelete('restrict');
+            $table->string('name')->nullable();
+            $table->string('title')->nullable();
+            $table->string('sub_title')->nullable();
+            $table->string('path')->nullable();
+            $table->string('icon_url')->nullable();
+            $table->string('access_permissions')->nullable();
             $table->timestamps();
         });
     }

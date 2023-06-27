@@ -10,10 +10,11 @@ composer update &&
 php artisan migrate
 
 php artisan make:migration alter_table_users_change_pin_number --table=users
-php artisan make:migration add_column_location_to_category_images_table --table=category_images
+php artisan make:migration add_column_menu_to_routes_table --table=routes
 php artisan make:migration drop_column_image_url_in_categories_table --table=categories
 php artisan make:migration rename_table_promotions_to_owner_promotions --table=promotions
-php artisan make:migration create_log_seeders_table --create=log_seeders
+php artisan make:migration create_master_lov_values_table --create=master_lov_values
+php artisan make:migration create_modules_table --create=modules
 
 
 update server

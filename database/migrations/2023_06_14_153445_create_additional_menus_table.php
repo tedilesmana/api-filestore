@@ -15,12 +15,22 @@ class CreateAdditionalMenusTable extends Migration
     {
         Schema::create('additional_menus', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('route_id')->constrained()
+                ->onUpdate('restrict')
+                ->onDelete('restrict');
+            $table->foreignId('menu_id')->constrained()
+                ->onUpdate('restrict')
+                ->onDelete('restrict');
+            $table->foreignId('sub_menu_id')->constrained()
+                ->onUpdate('restrict')
+                ->onDelete('restrict');
             $table->char('additional_menu_code', 35)->unique();
             $table->string('name')->nullable();
             $table->string('title')->nullable();
             $table->string('sub_title')->nullable();
             $table->string('path')->nullable();
             $table->string('icon_url')->nullable();
+            $table->string('access_permissions')->nullable();
             $table->timestamps();
         });
     }
@@ -28,7 +38,7 @@ class CreateAdditionalMenusTable extends Migration
     /**
      * Reverse the migrations.
      *
-     * @return void
+     * @return void 
      */
     public function down()
     {
