@@ -26,6 +26,25 @@ class AuthRepository implements AuthRepositoryInterface
         $this->messageGatewayService = $messageGatewayService;
     }
 
+    public function getAllUser($request)
+    {
+        $data_item = User::first();
+        $columns = $data_item ? array_keys($data_item->toArray()) : [];
+        $queryFilter = setQueryList($request, $columns);
+
+        $results = User::select('*')
+            ->whereRaw($queryFilter["queryKey"], $queryFilter["queryVal"])
+            ->WhereRaw($queryFilter["querySearchKey"], $queryFilter["querySearchVal"])
+            ->orderBy($request->orderKey ?? "id", $request->orderBy ?? "asc")
+            ->paginate($request->limit ?? 10);
+
+        if ($results) {
+            return $this->apiController->trueResult("Data applikasi berhasil di temukan", (object) ["data" => UserResource::collection($results), "pagination" => setPagination($results)]);
+        } else {
+            return $this->apiController->falseResult("Data applikasi gagal di ambil", null);
+        }
+    }
+
     function randomUsername($string)
     {
         $pattern = " ";

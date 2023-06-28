@@ -10,4 +10,9 @@ class Employee extends Model
     use HasFactory;
     const CODE = 'A1-EMPLO';
     protected $guarded = array('id');
+
+    public function trackJabatan()
+    {
+        return $this->hasMany(TrackJabatanStruktural::class,  'refkey', 'personal_uid');
+    }
 }

@@ -22,7 +22,6 @@ class GatewayApplicationRepository implements GatewayApplicationRepositoryInterf
 
     public function getAll($request)
     {
-
         $data_item = Application::first();
         $columns = $data_item ? array_keys($data_item->toArray()) : [];
         $queryFilter = setQueryList($request, $columns);

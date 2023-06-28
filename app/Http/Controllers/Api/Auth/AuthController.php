@@ -20,7 +20,7 @@ class AuthController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             $response = $this->authRepository->getAllUser($request);
