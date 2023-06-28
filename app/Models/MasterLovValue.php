@@ -11,4 +11,9 @@ class MasterLovValue extends Model
     use SoftDeletes;
     use HasFactory;
     protected $guarded = array('id');
+
+    public function masterLovGroup()
+    {
+        return $this->belongsTo(MasterLovGroup::class);
+    }
 }

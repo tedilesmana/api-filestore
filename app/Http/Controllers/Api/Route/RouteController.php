@@ -72,7 +72,16 @@ class RouteController extends BaseController
      */
     public function show($id)
     {
-        //
+        try {
+            $response = $this->eloquentRepository->getById($id);
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 
     /**
@@ -83,7 +92,16 @@ class RouteController extends BaseController
      */
     public function edit($id)
     {
-        //
+        try {
+            $response = $this->eloquentRepository->getById($id);
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
     }
 
     /**

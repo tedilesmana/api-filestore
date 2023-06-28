@@ -11,4 +11,9 @@ class MasterLovGroup extends Model
     use SoftDeletes;
     use HasFactory;
     protected $guarded = array('id');
+
+    public function masterLovValues()
+    {
+        return $this->hasMany(MasterLovValue::class);
+    }
 }

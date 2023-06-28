@@ -14,6 +14,15 @@ class AdditionalMenuResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'additional_menu_code' => $this->additional_menu_code,
+            'name' => $this->name,
+            'title' => $this->title,
+            'sub_title' => $this->sub_title,
+            'path' => $this->path,
+            'icon_url' => $this->icon_url,
+            'access_permissions' => $this->access_permissions,
+        ];
     }
 }

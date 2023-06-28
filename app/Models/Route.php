@@ -12,4 +12,9 @@ class Route extends Model
     use HasFactory;
     const CODE = 'A1-ROUTE';
     protected $guarded = array('id');
+
+    public function menus()
+    {
+        return $this->hasMany(Menu::class);
+    }
 }

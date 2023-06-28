@@ -12,4 +12,9 @@ class SubMenu extends Model
     use SoftDeletes;
     const CODE = 'A1-SMENU';
     protected $guarded = array('id');
+
+    public function additionalMenus()
+    {
+        return $this->hasMany(AdditionalMenu::class);
+    }
 }
