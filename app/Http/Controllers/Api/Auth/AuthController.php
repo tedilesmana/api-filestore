@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\BaseController;
-use App\Models\User;
 use App\Repositories\Interfaces\Auth\AuthRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class AuthController extends BaseController
 {
@@ -24,7 +22,16 @@ class AuthController extends BaseController
      */
     public function index()
     {
-        //
+        try {
+            $response = $this->authRepository->getAllUser($request);
+            if ($response->success) {
+                return $this->successResponse('Anda telah berhasil masuk', $response->data);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), $e);
+        }
     }
 
     /**
