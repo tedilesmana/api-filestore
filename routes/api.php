@@ -38,7 +38,6 @@ Route::post('auth/login-by-whatsapp', [AuthController::class, 'loginWithWhatsApp
 Route::post('auth/login-by-google', [AuthController::class, 'login']);
 Route::post('auth/login-by-whatsapp/validate', [AuthController::class, 'generateTokenWhatsApp']);
 Route::get('unauthorize', [AuthController::class, 'unauthorize']);
-Route::resource('auth', AuthController::class);
 
 Route::get('/', function () {
     return view('welcome');
@@ -46,6 +45,7 @@ Route::get('/', function () {
 
 Route::middleware('auth:api')->group(function () {
     Route::post('auth/logout', [AuthController::class, 'logout']);
+    Route::resource('auth', AuthController::class);
     Route::resource('presensi', PresensiController::class);
     Route::resource('master-location', MasterLocationController::class);
     Route::get('working-shift/default/{id}', [WorkingShiftController::class, 'getDefaultShift']);
