@@ -21,6 +21,12 @@ class AppServiceProvider extends ServiceProvider
             'GatewayFeature',
             'GatewayManager',
             'SeederDb',
+            'MasterLovGroup',
+            'MasterLovValue',
+            'Route',
+            'Menu',
+            'SubMenu',
+            'AdditionalMenu',
         );
 
         foreach ($models as $model) {

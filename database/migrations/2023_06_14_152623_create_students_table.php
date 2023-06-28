@@ -28,6 +28,7 @@ class CreateStudentsTable extends Migration
             $table->dateTime('tanggal_lulus')->nullable();
             $table->char('semester_masuk', 35)->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -26,6 +26,7 @@ class CreateUserDetailsTable extends Migration
             $table->string('kode_pos')->nullable();
             $table->string('nik_ktp')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

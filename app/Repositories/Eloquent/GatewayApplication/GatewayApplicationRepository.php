@@ -20,20 +20,47 @@ class GatewayApplicationRepository implements GatewayApplicationRepositoryInterf
         $this->messageGatewayService = $messageGatewayService;
     }
 
-    public function getAll()
+    public function getAll($request)
     {
-        return $this->apiController->trueResult("Semua data aplikasi berhasil di ambil", Application::all());
+
+        $data_item = Application::first();
+        $columns = $data_item ? array_keys($data_item->toArray()) : [];
+        $queryFilter = setQueryList($request, $columns);
+
+        $results = Application::select('*')
+            ->whereRaw($queryFilter["queryKey"], $queryFilter["queryVal"])
+            ->WhereRaw($queryFilter["querySearchKey"], $queryFilter["querySearchVal"])
+            ->orderBy($request->orderKey ?? "id", $request->orderBy ?? "asc")
+            ->paginate($request->limit ?? 10);
+
+        if ($results) {
+            return $this->apiController->trueResult("Data applikasi berhasil di temukan", (object) ["data" => $results, "pagination" => setPagination($results)]);
+        } else {
+            return $this->apiController->falseResult("Data applikasi gagal di ambil", null);
+        }
     }
 
     public function getById($id)
     {
-        return $this->apiController->trueResult("Detail data berhasil di ambil", Application::find($id));
+        $results = Application::find($id);
+
+        if ($results) {
+            return $this->apiController->trueResult("Data applikasi berhasil di temukan", (object) ["data" => $results, "pagination" => null]);
+        } else {
+            return $this->apiController->falseResult("Data applikasi gagal di ambil", null);
+        }
     }
 
     public function create($request)
     {
         $input = $request->all();
-        return $this->apiController->trueResult("Data applikasi berhasil di tambahkan", Application::create($input));
+        $results = Application::create($input);
+
+        if ($results) {
+            return $this->apiController->trueResult("Data applikasi berhasil di buat", (object) ["data" => $results, "pagination" => null]);
+        } else {
+            return $this->apiController->falseResult("Data applikasi gagal di buat", null);
+        }
     }
 
     public function update($request, $id)
@@ -53,7 +80,11 @@ class GatewayApplicationRepository implements GatewayApplicationRepositoryInterf
 
             $application->save();
 
-            return $this->apiController->trueResult("Data applikasi berhasil di update", $application);
+            if ($application) {
+                return $this->apiController->trueResult("Data applikasi berhasil di update", (object) ["data" => $application, "pagination" => null]);
+            } else {
+                return $this->apiController->falseResult("Data applikasi gagal di update", null);
+            }
         } else {
             return $this->apiController->falseResult("Data applikasi gagal di update", null);
         }
@@ -66,7 +97,12 @@ class GatewayApplicationRepository implements GatewayApplicationRepositoryInterf
         if ($application) {
             Schema::dropIfExists($application->slug);
             $application->delete();
-            return $this->apiController->trueResult("Data applikasi berhasil di hapus", $application);
+
+            if ($application) {
+                return $this->apiController->trueResult("Data applikasi berhasil di hapus", (object) ["data" => $application, "pagination" => null]);
+            } else {
+                return $this->apiController->falseResult("Data applikasi gagal di hapus", null);
+            }
         } else {
             return $this->apiController->falseResult("Data applikasi gagal di hapus", null);
         }

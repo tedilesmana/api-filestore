@@ -19,12 +19,12 @@ class FeatureController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $response = $this->gatewayFeatureRepository->getAll();
+            $response = $this->gatewayFeatureRepository->getAll($request);
             if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
             } else {
                 return $this->errorResponse($response->message, $response->data);
             }
@@ -54,7 +54,7 @@ class FeatureController extends BaseController
         try {
             $response = $this->gatewayFeatureRepository->create($request);
             if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
             } else {
                 return $this->errorResponse($response->message, $response->data);
             }
@@ -74,7 +74,7 @@ class FeatureController extends BaseController
         try {
             $response = $this->gatewayFeatureRepository->getById($id);
             if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
             } else {
                 return $this->errorResponse($response->message, $response->data);
             }
@@ -106,7 +106,7 @@ class FeatureController extends BaseController
         try {
             $response = $this->gatewayFeatureRepository->update($request, $id);
             if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
             } else {
                 return $this->errorResponse($response->message, $response->data);
             }
@@ -126,7 +126,7 @@ class FeatureController extends BaseController
         try {
             $response = $this->gatewayFeatureRepository->delete($id);
             if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
             } else {
                 return $this->errorResponse($response->message, $response->data);
             }

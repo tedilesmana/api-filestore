@@ -16,6 +16,8 @@ php artisan make:migration rename_table_promotions_to_owner_promotions --table=p
 php artisan make:migration create_master_lov_values_table --create=master_lov_values
 php artisan make:migration create_modules_table --create=modules
 
+php artisan make:controller Api/Menu/MenuController -r
+
 
 update server
 

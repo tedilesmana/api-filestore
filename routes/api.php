@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdditionalMenu\AdditionalMenuController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\FileHandler\FileHandlerController;
 use App\Http\Controllers\Api\GatewayManager\ApplicationController;
@@ -10,7 +11,12 @@ use App\Http\Controllers\Api\Hris\MasterLocationController;
 use App\Http\Controllers\Api\Hris\PresensiController;
 use App\Http\Controllers\Api\Hris\SettingController;
 use App\Http\Controllers\Api\Hris\WorkingShiftController;
+use App\Http\Controllers\Api\MasterLovGroup\MasterLovGroupController;
+use App\Http\Controllers\Api\MasterLovValue\MasterLovValueController;
+use App\Http\Controllers\Api\Menu\MenuController;
+use App\Http\Controllers\Api\Route\RouteController;
 use App\Http\Controllers\Api\Seeder\SeederDbController;
+use App\Http\Controllers\Api\SubMenu\SubMenuController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -65,4 +71,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('upload/file/s3', [FileHandlerController::class, 'uploadFileToS3']);
     Route::post('upload/file/resize', [FileHandlerController::class, 'uploadFileResize']);
     Route::post('upload/file/moveToS3', [FileHandlerController::class, 'moveToS3']);
+    Route::resource('route', RouteController::class);
+    Route::resource('menu', MenuController::class);
+    Route::resource('sub-menu', SubMenuController::class);
+    Route::resource('additional-menu', AdditionalMenuController::class);
+    Route::resource('master-lov-value', MasterLovValueController::class);
+    Route::resource('master-lov-group', MasterLovGroupController::class);
 });

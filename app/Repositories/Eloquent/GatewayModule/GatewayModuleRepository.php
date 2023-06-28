@@ -19,20 +19,47 @@ class GatewayModuleRepository implements GatewayModuleRepositoryInterface
         $this->messageGatewayService = $messageGatewayService;
     }
 
-    public function getAll()
+    public function getAll($request)
     {
-        return $this->apiController->trueResult("Semua data berhasil di ambil", Module::all());
+
+        $data_item = Module::first();
+        $columns = $data_item ? array_keys($data_item->toArray()) : [];
+        $queryFilter = setQueryList($request, $columns);
+
+        $results = Module::select('*')
+            ->whereRaw($queryFilter["queryKey"], $queryFilter["queryVal"])
+            ->WhereRaw($queryFilter["querySearchKey"], $queryFilter["querySearchVal"])
+            ->orderBy($request->orderKey ?? "id", $request->orderBy ?? "asc")
+            ->paginate($request->limit ?? 10);
+
+        if ($results) {
+            return $this->apiController->trueResult("Data additional menu berhasil di temukan", (object) ["data" => $results, "pagination" => setPagination($results)]);
+        } else {
+            return $this->apiController->falseResult("Data additional menu gagal di ambil", null);
+        }
     }
 
     public function getById($id)
     {
-        return $this->apiController->trueResult("Semua data dengan id yang di maksud berhasil di ambil", Module::where("application_id", $id)->get());
+        $result = Module::where("application_id", $id)->get();
+
+        if ($result) {
+            return $this->apiController->trueResult("Data module berhasil di ambil", (object) ["data" => $result, "pagination" => null]);
+        } else {
+            return $this->apiController->falseResult("Data module gagal di ambil", null);
+        }
     }
 
     public function create($request)
     {
         $input = $request->all();
-        return $this->apiController->trueResult("Data modul berhasil di tambahkan", Module::create($input));
+        $result = Module::create($input);
+
+        if ($result) {
+            return $this->apiController->trueResult("Data module berhasil di buat", (object) ["data" => $result, "pagination" => null]);
+        } else {
+            return $this->apiController->falseResult("Data module gagal di buat", null);
+        }
     }
 
     public function update($request, $id)
@@ -51,7 +78,11 @@ class GatewayModuleRepository implements GatewayModuleRepositoryInterface
 
             $application->save();
 
-            return $this->apiController->trueResult("Data modul berhasil di update", $application);
+            if ($application) {
+                return $this->apiController->trueResult("Data module berhasil di update", (object) ["data" => $application, "pagination" => null]);
+            } else {
+                return $this->apiController->falseResult("Data module gagal di update", null);
+            }
         } else {
             return $this->apiController->falseResult("Data modul gagal di update", null);
         }
@@ -64,7 +95,11 @@ class GatewayModuleRepository implements GatewayModuleRepositoryInterface
         if ($application) {
             $application->delete();
 
-            return $this->apiController->trueResult("Data modul berhasil di hapus", $application);
+            if ($application) {
+                return $this->apiController->trueResult("Data module berhasil di hapus", (object) ["data" => $application, "pagination" => null]);
+            } else {
+                return $this->apiController->falseResult("Data module gagal di hapus", null);
+            }
         } else {
             return $this->apiController->falseResult("Data modul gagal di hapus", null);
         }

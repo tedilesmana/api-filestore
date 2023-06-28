@@ -17,6 +17,7 @@ class CreateMasterLovGroupsTable extends Migration
             $table->id();
             $table->string('group_name')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

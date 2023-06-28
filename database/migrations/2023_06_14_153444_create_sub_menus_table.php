@@ -15,9 +15,6 @@ class CreateSubMenusTable extends Migration
     {
         Schema::create('sub_menus', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('route_id')->constrained()
-                ->onUpdate('restrict')
-                ->onDelete('restrict');
             $table->foreignId('menu_id')->constrained()
                 ->onUpdate('restrict')
                 ->onDelete('restrict');
@@ -29,6 +26,7 @@ class CreateSubMenusTable extends Migration
             $table->string('icon_url')->nullable();
             $table->string('access_permissions')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

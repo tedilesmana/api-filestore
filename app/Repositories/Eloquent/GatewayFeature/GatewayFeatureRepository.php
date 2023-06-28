@@ -19,9 +19,24 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
         $this->messageGatewayService = $messageGatewayService;
     }
 
-    public function getAll()
+    public function getAll($request)
     {
-        return $this->apiController->trueResult("Semua data berhasil di ambil", Feature::all());
+
+        $data_item = Feature::first();
+        $columns = $data_item ? array_keys($data_item->toArray()) : [];
+        $queryFilter = setQueryList($request, $columns);
+
+        $results = Feature::select('*')
+            ->whereRaw($queryFilter["queryKey"], $queryFilter["queryVal"])
+            ->WhereRaw($queryFilter["querySearchKey"], $queryFilter["querySearchVal"])
+            ->orderBy($request->orderKey ?? "id", $request->orderBy ?? "asc")
+            ->paginate($request->limit ?? 10);
+
+        if ($results) {
+            return $this->apiController->trueResult("Data feature berhasil di temukan", (object) ["data" => $results, "pagination" => setPagination($results)]);
+        } else {
+            return $this->apiController->falseResult("Data feature gagal di ambil", null);
+        }
     }
 
     public function getById($id)
@@ -32,7 +47,13 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
     public function create($request)
     {
         $input = $request->all();
-        return $this->apiController->trueResult("Data feature berhasil di tambahkan", Feature::create($input));
+        $result = Feature::create($input);
+
+        if ($result) {
+            return $this->apiController->trueResult("Data feature berhasil di buat", (object) ["data" => $result, "pagination" => null]);
+        } else {
+            return $this->apiController->falseResult("Data feature gagal di buat", null);
+        }
     }
 
     public function update($request, $id)
@@ -51,7 +72,11 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
 
             $application->save();
 
-            return $this->apiController->trueResult("Data feature berhasil di update", $application);
+            if ($application) {
+                return $this->apiController->trueResult("Data feature berhasil di update", (object) ["data" => $application, "pagination" => null]);
+            } else {
+                return $this->apiController->falseResult("Data feature gagal di update", null);
+            }
         } else {
             return $this->apiController->falseResult("Data feature gagal di update", null);
         }
@@ -64,7 +89,11 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
         if ($application) {
             $application->delete();
 
-            return $this->apiController->trueResult("Data feature berhasil di hapus", $application);
+            if ($application) {
+                return $this->apiController->trueResult("Data feature berhasil di hapus", (object) ["data" => $application, "pagination" => null]);
+            } else {
+                return $this->apiController->falseResult("Data feature gagal di hapus", null);
+            }
         } else {
             return $this->apiController->falseResult("Data feature gagal di hapus", null);
         }

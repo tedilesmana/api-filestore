@@ -26,6 +26,7 @@ class CreateDlbEmployeesTable extends Migration
             $table->char('initial', 35)->nullable();
             $table->char('nidn', 35)->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -4,7 +4,7 @@ namespace App\Repositories\Interfaces\GatewayApplication;
 
 interface GatewayApplicationRepositoryInterface
 {
-    public function getAll();
+    public function getAll($request);
     public function getById($id);
     public function create($request);
     public function update($request, $id);

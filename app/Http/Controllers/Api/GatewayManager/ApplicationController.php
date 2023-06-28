@@ -19,12 +19,12 @@ class ApplicationController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $response = $this->gatewayApplicationRepository->getAll();
+            $response = $this->gatewayApplicationRepository->getAll($request);
             if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
             } else {
                 return $this->errorResponse($response->message, $response->data);
             }
@@ -54,7 +54,7 @@ class ApplicationController extends BaseController
         try {
             $response = $this->gatewayApplicationRepository->create($request);
             if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
             } else {
                 return $this->errorResponse($response->message, $response->data);
             }
@@ -97,7 +97,7 @@ class ApplicationController extends BaseController
         try {
             $response = $this->gatewayApplicationRepository->update($request, $id);
             if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
             } else {
                 return $this->errorResponse($response->message, $response->data);
             }
@@ -117,7 +117,7 @@ class ApplicationController extends BaseController
         try {
             $response = $this->gatewayApplicationRepository->delete($id);
             if ($response->success) {
-                return $this->successResponse($response->message, $response->data);
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
             } else {
                 return $this->errorResponse($response->message, $response->data);
             }

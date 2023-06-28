@@ -15,9 +15,13 @@ class CreateMasterLovValuesTable extends Migration
     {
         Schema::create('master_lov_values', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('master_lov_group_id')->constrained()
+                ->onUpdate('restrict')
+                ->onDelete('restrict');
             $table->string('group_name')->nullable();
             $table->string('values')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

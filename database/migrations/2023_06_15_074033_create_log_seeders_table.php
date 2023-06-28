@@ -19,6 +19,7 @@ class CreateLogSeedersTable extends Migration
             $table->integer('jumlah_data')->nullable();
             $table->string('current_page');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

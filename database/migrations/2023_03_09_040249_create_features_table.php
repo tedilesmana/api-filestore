@@ -23,6 +23,7 @@ class CreateFeaturesTable extends Migration
             $table->string('description');
             $table->string('slug');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

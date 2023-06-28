@@ -26,6 +26,7 @@ class CreateMenusTable extends Migration
             $table->string('icon_url')->nullable();
             $table->string('access_permissions')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -23,6 +23,7 @@ class CreateApplicationsTable extends Migration
             $table->string('slug');
             $table->string('token')->unique();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
