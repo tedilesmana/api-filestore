@@ -25,7 +25,7 @@ class AuthController extends BaseController
         try {
             $response = $this->authRepository->getAllUser($request);
             if ($response->success) {
-                return $this->successResponse('Anda telah berhasil masuk', $response->data);
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
             } else {
                 return $this->errorResponse($response->message, $response->data);
             }

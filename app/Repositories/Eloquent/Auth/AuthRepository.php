@@ -39,9 +39,9 @@ class AuthRepository implements AuthRepositoryInterface
             ->paginate($request->limit ?? 10);
 
         if ($results) {
-            return $this->apiController->trueResult("Data applikasi berhasil di temukan", (object) ["data" => UserResource::collection($results), "pagination" => setPagination($results)]);
+            return $this->apiController->trueResult("Data user berhasil di temukan", (object) ["data" => UserResource::collection($results), "pagination" => setPagination($results)]);
         } else {
-            return $this->apiController->falseResult("Data applikasi gagal di ambil", null);
+            return $this->apiController->falseResult("Data user gagal di ambil", null);
         }
     }
 
