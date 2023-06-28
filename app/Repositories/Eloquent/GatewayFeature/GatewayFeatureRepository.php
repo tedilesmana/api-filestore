@@ -21,7 +21,6 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
 
     public function getAll($request)
     {
-
         $data_item = Feature::first();
         $columns = $data_item ? array_keys($data_item->toArray()) : [];
         $queryFilter = setQueryList($request, $columns);
