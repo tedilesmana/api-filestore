@@ -16,7 +16,7 @@ class AuthController extends BaseController
     }
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resources.
      *
      * @return \Illuminate\Http\Response
      */
