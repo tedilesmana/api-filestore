@@ -42,7 +42,7 @@ function decodePhoneNumber($phone)
     return $phone_number[0];
 }
 
-function setQueryList($request, $columns)
+function setQueryList($request, $columns, $id = 'id')
 {
     //filter
     $key_filter = '';
@@ -97,7 +97,7 @@ function setQueryList($request, $columns)
 
     $list_val = $isSearchDateRange ? [...$value_filter, $fromDateTime, $toDateTime] : [...$value_filter];
 
-    $queryKey = strlen($list_key) > 0 ? $list_key : " (`id` like ? ) ";
+    $queryKey = strlen($list_key) > 0 ? $list_key : " (`$id` like ? ) ";
     $queryVal = count($list_val) > 0 ? $list_val : ["%%"];
 
     //searching
@@ -118,7 +118,7 @@ function setQueryList($request, $columns)
         }
     }
 
-    $querySearchKey = strlen($key_searching) > 0 ? " (" . $key_searching  . " ) " : " (`id` like ? ) ";
+    $querySearchKey = strlen($key_searching) > 0 ? " (" . $key_searching  . " ) " : " (`$id` like ? ) ";
     $querySearchVal = count($value_searching) > 0 ? $value_searching : ["%%"];
 
     return [

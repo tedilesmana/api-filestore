@@ -32,12 +32,12 @@ class AuthRepository implements AuthRepositoryInterface
     {
         $data_item = MasterJabatan::first();
         $columns = $data_item ? array_keys($data_item->toArray()) : [];
-        $queryFilter = setQueryList($request, $columns);
+        $queryFilter = setQueryList($request, $columns, 'acajbt_uid');
 
         $results = MasterJabatan::select('*')
             ->whereRaw($queryFilter["queryKey"], $queryFilter["queryVal"])
             ->WhereRaw($queryFilter["querySearchKey"], $queryFilter["querySearchVal"])
-            ->orderBy($request->orderKey ?? "id", $request->orderBy ?? "asc")
+            ->orderBy($request->orderKey ?? "acajbt_uid", $request->orderBy ?? "asc")
             ->paginate($request->limit ?? 10);
 
         if ($results) {
