@@ -147,6 +147,25 @@ class AuthController extends BaseController
         }
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function listJabatan(Request $request)
+    {
+        try {
+            $response = $this->authRepository->listJabatan($request);
+            if ($response->success) {
+                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
+            } else {
+                return $this->errorResponse($response->message, $response->data);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), $e);
+        }
+    }
+
     public function logout()
     {
         try {

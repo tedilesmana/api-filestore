@@ -4,8 +4,10 @@ namespace App\Repositories\Eloquent\Auth;
 
 use App\Models\User;
 use App\Http\Controllers\BaseController;
+use App\Http\Resources\Jabatan\MasterJabatanResource;
 use App\Http\Resources\User\UserResource;
 use App\Models\Employee;
+use App\Models\MasterJabatan;
 use App\Models\UserDetail;
 use App\Repositories\Interfaces\Auth\AuthRepositoryInterface;
 use App\Services\MessageGatewayService;
@@ -24,6 +26,25 @@ class AuthRepository implements AuthRepositoryInterface
     {
         $this->apiController = $apiController;
         $this->messageGatewayService = $messageGatewayService;
+    }
+
+    public function listJabatan($request)
+    {
+        $data_item = MasterJabatan::first();
+        $columns = $data_item ? array_keys($data_item->toArray()) : [];
+        $queryFilter = setQueryList($request, $columns);
+
+        $results = MasterJabatan::select('*')
+            ->whereRaw($queryFilter["queryKey"], $queryFilter["queryVal"])
+            ->WhereRaw($queryFilter["querySearchKey"], $queryFilter["querySearchVal"])
+            ->orderBy($request->orderKey ?? "id", $request->orderBy ?? "asc")
+            ->paginate($request->limit ?? 10);
+
+        if ($results) {
+            return $this->apiController->trueResult("Data user berhasil di temukan", (object) ["data" => MasterJabatanResource::collection($results), "pagination" => setPagination($results)]);
+        } else {
+            return $this->apiController->falseResult("Data user gagal di ambil", null);
+        }
     }
 
     public function getAllUser($request)

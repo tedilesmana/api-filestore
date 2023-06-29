@@ -44,6 +44,7 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth:api')->group(function () {
+    Route::get('auth/list-jabatan', [AuthController::class, 'listJabatan']);
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::resource('auth', AuthController::class);
     Route::resource('presensi', PresensiController::class);
