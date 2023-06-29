@@ -25,6 +25,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'name' => $this->name,
             'phone_number' => $this->phone_number,
+            'nik_ktp' => is_null($this->userDetail) ? null : $this->userDetail->nik_ktp,
             'employee' => new EmployeeResource($this->employee),
             'dlb_employee' => new DlbEmployeeResource($this->dlbEmployee),
             'student' => new StudentResource($this->student),
