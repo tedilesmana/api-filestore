@@ -254,22 +254,6 @@ function deleteImage($image_url)
 function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 {
     $reducePath = env('REDUCE_PATH');
-    Log::critical('REDUCE_PATH');
-    Log::critical($reducePath);
-    Log::critical('REDUCE_PATH');
-    Log::critical($reducePath);
-    Log::critical('REDUCE_PATH');
-    Log::critical($reducePath);
-    Log::critical('REDUCE_PATH');
-    Log::critical($reducePath);
-    Log::critical($reducePath);
-    Log::critical($reducePath);
-    Log::critical($reducePath);
-    Log::critical($reducePath);
-    Log::critical($reducePath);
-    Log::critical($reducePath);
-    Log::critical($reducePath);
-    Log::critical($reducePath);
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
             '-m85',
@@ -335,11 +319,15 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             "image_url" => $imageNameWithExtention,
             "name" => $fileName
         ];
+
+        $sizeWebp = Storage::size(substr($output, 21 + $reducePath));
+        $extWebp = File::extension(substr($output, 21 + $reducePath));
+        $imageNameWithExtentionWebp = substr($output, 33 + $reducePath);
         $dataWebp = [
-            "size" => $size,
-            "extention" => $ext,
+            "size" => $sizeWebp,
+            "extention" => $extWebp,
             "type" => $type,
-            "image_url" => $imageNameWithExtention,
+            "image_url" => $imageNameWithExtentionWebp,
             "name" => $fileName
         ];
 

@@ -64,7 +64,6 @@ class FileHandlerController extends BaseController
                 ];
 
                 $resultImageDetails = [$dataImage, ...$resultImageDetails];
-
                 unlink($imagePath);
             }
         }
