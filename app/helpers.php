@@ -253,7 +253,7 @@ function deleteImage($image_url)
 
 function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 {
-    Log::critical("pathFile");
+    $reducePath = env('REDUCE_PATH');
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
             '-m85',
@@ -282,84 +282,55 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             '-q 90',
         ]));
 
-    Log::critical("pathFile2");
     $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
-    Log::critical("pathFile23");
     $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
     $images = $multiSizeImage->processImage($pathFile);
-    Log::critical("pathFile24");
     $imageDetails = array();
 
     foreach ($images as $image) {
-        $imageNameWithExtention = substr($image, 33);
+        $imageNameWithExtention = substr($image, 33 + $reducePath);
         $output = '';
         $type = '';
 
         if (str_contains($imageNameWithExtention, 'lg')) {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@lg' . '.webp');
-            Log::critical("pathFile25");
-            Log::critical($output);
             $type .= 'large';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'md')) {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@md' . '.webp');
-            Log::critical("pathFile26");
-            Log::critical($output);
             $type .= 'medium';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'sm')) {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@sm' . '.webp');
-            Log::critical("pathFile27");
-            Log::critical($output);
             $type .= 'small';
             convertToWebp($image, $output);
         } else {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@tb' . '.webp');
-            Log::critical("pathFile28");
-            Log::critical($output);
-            Log::critical($image);
             $type .= 'thumbnail';
             convertToWebp($image, $output);
-            Log::critical("pathFile289new");
-            Log::critical($image);
         }
 
-        Log::critical("str");
-        Log::critical(substr($image, 21));
-        $size = Storage::size(substr($image, 21));
-        Log::critical("pathFile28923");
-        Log::critical($size);
-        $ext = File::extension(substr($image, 21));
-        Log::critical("pathFile28955");
-        Log::critical($ext);
-        $path = substr($image, 33);
-        Log::critical("pathFile28922");
-        Log::critical($image);
+        $size = Storage::size(substr($image, 21 + $reducePath));
+        $ext = File::extension(substr($image, 21 + $reducePath));
         $dataImage = [
             "size" => $size,
             "extention" => $ext,
             "type" => $type,
-            "image_url" => $path,
+            "image_url" => $imageNameWithExtention,
             "name" => $fileName
         ];
-        Log::critical("pathFile29");
-        Log::critical($dataImage);
         $dataWebp = [
-            "size" => Storage::size(substr($output, 21)),
-            "extention" => File::extension(substr($output, 21)),
+            "size" => $size,
+            "extention" => $ext,
             "type" => $type,
-            "image_url" => substr($output, 33),
+            "image_url" => $imageNameWithExtention,
             "name" => $fileName
         ];
-        Log::critical("pathFile30");
-        Log::critical($dataWebp);
 
         $dataImages = [
             "webp" => $dataWebp,
             "image" => $dataImage
         ];
-        Log::critical("pathFile31");
-        Log::critical($dataImages);
 
         $imageDetails = [$dataImages, ...$imageDetails];
     }
@@ -369,6 +340,7 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 
 function resizeImageOriginal($directory, $imageNameWithExtension, $fileName)
 {
+    $reducePath = env('REDUCE_PATH');
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
             '-m85',
@@ -403,7 +375,7 @@ function resizeImageOriginal($directory, $imageNameWithExtension, $fileName)
     $imageDetails = array();
 
     foreach ($images as $image) {
-        $imageNameWithExtention = substr($image, 33);
+        $imageNameWithExtention = substr($image, 33 + $reducePath);
         $type = '';
 
         if (str_contains($imageNameWithExtention, 'lg')) {
@@ -417,10 +389,10 @@ function resizeImageOriginal($directory, $imageNameWithExtension, $fileName)
         }
 
         $dataImage = [
-            "size" => Storage::size(substr($image, 21)),
-            "extention" => File::extension(substr($image, 21)),
+            "size" => Storage::size(substr($image, 21 + $reducePath)),
+            "extention" => File::extension(substr($image, 21 + $reducePath)),
             "type" => $type,
-            "image_url" => substr($image, 33),
+            "image_url" => substr($image, 33 + $reducePath),
         ];
 
         $dataImage = [
@@ -435,6 +407,7 @@ function resizeImageOriginal($directory, $imageNameWithExtension, $fileName)
 
 function resizeImageToWebp($directory, $imageNameWithExtension, $fileName)
 {
+    $reducePath = env('REDUCE_PATH');
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
             '-m85',
@@ -469,7 +442,7 @@ function resizeImageToWebp($directory, $imageNameWithExtension, $fileName)
     $imageDetails = array();
 
     foreach ($images as $image) {
-        $imageNameWithExtention = substr($image, 33);
+        $imageNameWithExtention = substr($image, 33 + $reducePath);
         $output = '';
         $type = '';
 
@@ -492,17 +465,17 @@ function resizeImageToWebp($directory, $imageNameWithExtension, $fileName)
         }
 
         $dataImage = [
-            "size" => Storage::size(substr($image, 21)),
-            "extention" => File::extension(substr($image, 21)),
+            "size" => Storage::size(substr($image, 21 + $reducePath)),
+            "extention" => File::extension(substr($image, 21 + $reducePath)),
             "type" => $type,
-            "image_url" => substr($image, 33),
+            "image_url" => substr($image, 33 + $reducePath),
         ];
 
         $dataWebp = [
-            "size" => Storage::size(substr($output, 21)),
-            "extention" => File::extension(substr($output, 21)),
+            "size" => Storage::size(substr($output, 21 + $reducePath)),
+            "extention" => File::extension(substr($output, 21 + $reducePath)),
             "type" => $type,
-            "image_url" => substr($output, 33),
+            "image_url" => substr($output, 33 + $reducePath),
         ];
 
         $dataImage = [
