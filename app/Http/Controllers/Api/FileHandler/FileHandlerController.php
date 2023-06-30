@@ -6,6 +6,7 @@ use App\Http\Controllers\BaseController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class FileHandlerController extends BaseController
