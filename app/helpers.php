@@ -288,7 +288,7 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
     $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
     $images = $multiSizeImage->processImage($pathFile);
     dump("pathFile24");
-    dump($images);
+    dd($images);
     $imageDetails = array();
 
     foreach ($images as $image) {
