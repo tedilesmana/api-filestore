@@ -48,7 +48,6 @@ class FileHandlerController extends BaseController
         $fileNameWithExt = $request->filename . '.' . $guessExtension;
         $directory = $request->directory;
         $request->file('file')->storeAs('public/files/' . $directory, $fileNameWithExt, 'local');
-        dd($directory);
         $imageDetails = resizeImageAll($directory, $fileNameWithExt, $request->filename);
         $resultImageDetails = array();
 

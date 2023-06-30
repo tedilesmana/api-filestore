@@ -253,6 +253,7 @@ function deleteImage($image_url)
 
 function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 {
+    dump("pathFile");
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
             '-m85',
@@ -281,8 +282,11 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             '-q 90',
         ]));
 
+    dump("pathFile2");
     $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
+    dump("pathFile23");
     $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
+    dd($pathFile);
     $images = $multiSizeImage->processImage($pathFile);
     $imageDetails = array();
 
