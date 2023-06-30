@@ -320,7 +320,7 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             Log::critical($image);
             $type .= 'thumbnail';
             convertToWebp($image, $output);
-            Log::critical("pathFile289");
+            Log::critical("pathFile289new");
             Log::critical($image);
         }
 
