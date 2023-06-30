@@ -314,6 +314,7 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             "extention" => File::extension(substr($image, 21)),
             "type" => $type,
             "image_url" => substr($image, 33),
+            "name" => $fileName
         ];
 
         $dataWebp = [
@@ -321,14 +322,15 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             "extention" => File::extension(substr($output, 21)),
             "type" => $type,
             "image_url" => substr($output, 33),
+            "name" => $fileName
         ];
 
-        $dataImage = [
+        $dataImages = [
             "webp" => $dataWebp,
             "image" => $dataImage
         ];
 
-        $imageDetails = [$dataImage, ...$imageDetails];
+        $imageDetails = [$dataImages, ...$imageDetails];
     }
 
     return $imageDetails;

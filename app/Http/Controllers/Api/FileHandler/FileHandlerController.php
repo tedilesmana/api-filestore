@@ -48,18 +48,26 @@ class FileHandlerController extends BaseController
         $directory = $request->directory;
         $request->file('file')->storeAs('public/files/' . $directory, $fileNameWithExt, 'local');
         $imageDetails = resizeImageAll($directory, $fileNameWithExt, $request->filename);
-
-        $pathUrls = [];
+        $resultImageDetails = array();
 
         foreach ($imageDetails as $imageTypes) {
             foreach ($imageTypes as $value) {
                 $imagePath = storage_path('app/public/files' . $value["image_url"]);
                 $path = uploadToS3Bucket($value["extention"] . '/' . $value["type"] . '/' . $directory . '/' . $request->filename . '#' . Carbon::now()->format('dmyhi') . '.' . $value["extention"], $imagePath);
-                $pathUrls = [...$pathUrls, $path];
+
+                $dataImage = [
+                    "extention" => $value["extention"],
+                    "type" => $value["type"],
+                    "image_url" => $path,
+                    "name" => $value["name"]
+                ];
+
+                $resultImageDetails = [$dataImage, ...$resultImageDetails];
+
                 unlink($imagePath);
             }
         }
-        return $this->successResponse("Image berhasil di simpan", ["source" => $imageDetails, "pathUrls" => $pathUrls]);
+        return $this->successResponse("Image berhasil di simpan", $resultImageDetails);
     }
 
     public function moveToS3(Request $request)
