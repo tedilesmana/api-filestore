@@ -160,7 +160,7 @@ function uploadImage($fileImage, $image, $directory, $type, $filename)
     $imageNameWithExtention = $fileName . '.' . $extention;
 
     if ($extention == 'svg') {
-        $image->move(storage_path('public/image/' . $directoryFile), $imageNameWithExtention);
+        $image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
 
         $data = [
             "size" => $fileSize,
@@ -173,14 +173,14 @@ function uploadImage($fileImage, $image, $directory, $type, $filename)
             "image" => $data
         ];
 
-        $imagePath = storage_path('public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
         uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
 
         return [$dataImage];
     }
 
     if ($extention == 'jpg' || $extention == 'jpeg' || $extention == 'png') {
-        $image->move(storage_path('public/image/' . $directoryFile), $imageNameWithExtention);
+        $image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
 
         $data = [
             "size" => $fileSize,
@@ -193,14 +193,14 @@ function uploadImage($fileImage, $image, $directory, $type, $filename)
             "image" => $data
         ];
 
-        $imagePath = storage_path('public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
         uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
 
         return [$dataImage];
     }
 
     if ($extention == 'webp') {
-        $image->move(storage_path('public/image/' . $directoryFile), $imageNameWithExtention);
+        $image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
 
         $data = [
             "size" => $fileSize,
@@ -213,7 +213,7 @@ function uploadImage($fileImage, $image, $directory, $type, $filename)
             "image" => $data
         ];
 
-        $imagePath = storage_path('public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
         uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
 
         return [$dataImage];
@@ -248,7 +248,7 @@ function uploadFile($file)
 
 function deleteImage($image_url)
 {
-    return File::delete(storage_path('public/image' . $image_url));
+    return File::delete(storage_path('app/public/image' . $image_url));
 }
 
 function resizeImageAll($directory, $imageNameWithExtension, $fileName)
@@ -282,7 +282,8 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
         ]));
 
     $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
-    $pathFile = storage_path('public/files/' . $directory . '/' . $imageNameWithExtension);
+    $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
+    dd($pathFile);
     $images = $multiSizeImage->processImage($pathFile);
     $imageDetails = array();
 
@@ -292,19 +293,19 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
         $type = '';
 
         if (str_contains($imageNameWithExtention, 'lg')) {
-            $output .= storage_path('public/files/' . $directory . '/' . $fileName . time() . '@lg' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@lg' . '.webp');
             $type .= 'large';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'md')) {
-            $output .= storage_path('public/files/' . $directory . '/' . $fileName . time() . '@md' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@md' . '.webp');
             $type .= 'medium';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'sm')) {
-            $output .= storage_path('public/files/' . $directory . '/' . $fileName . time() . '@sm' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@sm' . '.webp');
             $type .= 'small';
             convertToWebp($image, $output);
         } else {
-            $output .= storage_path('public/files/' . $directory . '/' . $fileName . time() . '@tb' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@tb' . '.webp');
             $type .= 'thumbnail';
             convertToWebp($image, $output);
         }
@@ -367,7 +368,7 @@ function resizeImageOriginal($directory, $imageNameWithExtension, $fileName)
         ]));
 
     $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
-    $pathFile = storage_path('public/files/' . $directory . '/' . $imageNameWithExtension);
+    $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
     $images = $multiSizeImage->processImage($pathFile);
     $imageDetails = array();
 
@@ -433,7 +434,7 @@ function resizeImageToWebp($directory, $imageNameWithExtension, $fileName)
         ]));
 
     $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
-    $pathFile = storage_path('public/files/' . $directory . '/' . $imageNameWithExtension);
+    $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
     $images = $multiSizeImage->processImage($pathFile);
     $imageDetails = array();
 
@@ -443,19 +444,19 @@ function resizeImageToWebp($directory, $imageNameWithExtension, $fileName)
         $type = '';
 
         if (str_contains($imageNameWithExtention, 'lg')) {
-            $output .= storage_path('public/files/' . $directory . '/' . $fileName . time() . '@lg' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@lg' . '.webp');
             $type .= 'large';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'md')) {
-            $output .= storage_path('public/files/' . $directory . '/' . $fileName . time() . '@md' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@md' . '.webp');
             $type .= 'medium';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'sm')) {
-            $output .= storage_path('public/files/' . $directory . '/' . $fileName . time() . '@sm' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@sm' . '.webp');
             $type .= 'small';
             convertToWebp($image, $output);
         } else {
-            $output .= storage_path('public/files/' . $directory . '/' . $fileName . time() . '@tb' . '.webp');
+            $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@tb' . '.webp');
             $type .= 'thumbnail';
             convertToWebp($image, $output);
         }
@@ -554,7 +555,7 @@ function uploadImageForSellerIdentity($request, $directory)
     $imageNameWithExtention = $fileName . '.' . $extention;
 
     if ($extention == 'svg') {
-        $request->image->move(storage_path('public/image/' . $directoryFile), $imageNameWithExtention);
+        $request->image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
 
         $data = [
             "size" => $fileSize,
@@ -567,14 +568,14 @@ function uploadImageForSellerIdentity($request, $directory)
             "image" => $data
         ];
 
-        $imagePath = storage_path('public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
         uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
 
         return [$dataImage];
     }
 
     if ($extention == 'jpg' || $extention == 'jpeg' || $extention == 'png') {
-        $request->image->move(storage_path('public/image/' . $directoryFile), $imageNameWithExtention);
+        $request->image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
 
         $data = [
             "size" => $fileSize,
@@ -587,14 +588,14 @@ function uploadImageForSellerIdentity($request, $directory)
             "image" => $data
         ];
 
-        $imagePath = storage_path('public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
         uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
 
         return [$dataImage];
     }
 
     if ($extention == 'webp') {
-        $request->image->move(storage_path('public/image/' . $directoryFile), $imageNameWithExtention);
+        $request->image->move(storage_path('app/public/image/' . $directoryFile), $imageNameWithExtention);
 
         $data = [
             "size" => $fileSize,
@@ -607,7 +608,7 @@ function uploadImageForSellerIdentity($request, $directory)
             "image" => $data
         ];
 
-        $imagePath = storage_path('public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
+        $imagePath = storage_path('app/public/image/' .  $directoryFile . '/' . $imageNameWithExtention);
         uploadToGoogleStorage($imagePath, $directoryFile . '/' . $imageNameWithExtention);
 
         return [$dataImage];
