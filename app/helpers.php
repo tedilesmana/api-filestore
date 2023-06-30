@@ -317,8 +317,11 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@tb' . '.webp');
             Log::critical("pathFile28");
             Log::critical($output);
+            Log::critical($image);
             $type .= 'thumbnail';
             convertToWebp($image, $output);
+            Log::critical("pathFile289");
+            Log::critical($image);
         }
 
         $dataImage = [
