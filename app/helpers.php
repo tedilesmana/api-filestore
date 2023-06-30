@@ -324,6 +324,8 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             Log::critical($image);
         }
 
+        Log::critical("str");
+        Log::critical(substr($image, 21));
         $size = Storage::size(substr($image, 21));
         Log::critical("pathFile28923");
         Log::critical($size);
