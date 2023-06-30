@@ -286,8 +286,9 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
     $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
     dump("pathFile23");
     $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
-    dd($pathFile);
     $images = $multiSizeImage->processImage($pathFile);
+    dump("pathFile24");
+    dump($images);
     $imageDetails = array();
 
     foreach ($images as $image) {
@@ -297,18 +298,26 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 
         if (str_contains($imageNameWithExtention, 'lg')) {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@lg' . '.webp');
+            dump("pathFile25");
+            dump($output);
             $type .= 'large';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'md')) {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@md' . '.webp');
+            dump("pathFile26");
+            dump($output);
             $type .= 'medium';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'sm')) {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@sm' . '.webp');
+            dump("pathFile27");
+            dump($output);
             $type .= 'small';
             convertToWebp($image, $output);
         } else {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@tb' . '.webp');
+            dump("pathFile28");
+            dump($output);
             $type .= 'thumbnail';
             convertToWebp($image, $output);
         }
@@ -320,7 +329,8 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             "image_url" => substr($image, 33),
             "name" => $fileName
         ];
-
+        dump("pathFile29");
+        dump($dataImage);
         $dataWebp = [
             "size" => Storage::size(substr($output, 21)),
             "extention" => File::extension(substr($output, 21)),
@@ -328,11 +338,15 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             "image_url" => substr($output, 33),
             "name" => $fileName
         ];
+        dump("pathFile30");
+        dump($dataWebp);
 
         $dataImages = [
             "webp" => $dataWebp,
             "image" => $dataImage
         ];
+        dump("pathFile31");
+        dump($dataImages);
 
         $imageDetails = [$dataImages, ...$imageDetails];
     }
