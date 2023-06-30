@@ -283,7 +283,6 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 
     $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
     $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
-    dd($pathFile);
     $images = $multiSizeImage->processImage($pathFile);
     $imageDetails = array();
 
