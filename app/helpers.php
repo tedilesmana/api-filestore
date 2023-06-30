@@ -324,11 +324,20 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             Log::critical($image);
         }
 
+        $size = Storage::size(substr($image, 21));
+        Log::critical("pathFile28923");
+        Log::critical($size);
+        $ext = File::extension(substr($image, 21));
+        Log::critical("pathFile28955");
+        Log::critical($ext);
+        $path = substr($image, 33);
+        Log::critical("pathFile28922");
+        Log::critical($image);
         $dataImage = [
-            "size" => Storage::size(substr($image, 21)),
-            "extention" => File::extension(substr($image, 21)),
+            "size" => $size,
+            "extention" => $ext,
             "type" => $type,
-            "image_url" => substr($image, 33),
+            "image_url" => $path,
             "name" => $fileName
         ];
         Log::critical("pathFile29");
