@@ -253,7 +253,7 @@ function deleteImage($image_url)
 
 function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 {
-    dump("pathFile");
+    Log::critical("pathFile");
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
             '-m85',
@@ -282,13 +282,12 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             '-q 90',
         ]));
 
-    dump("pathFile2");
+    Log::critical("pathFile2");
     $multiSizeImage = new \Guizoxxv\LaravelMultiSizeImage\MultiSizeImage($optimizerChain);
-    dump("pathFile23");
+    Log::critical("pathFile23");
     $pathFile = storage_path('app/public/files/' . $directory . '/' . $imageNameWithExtension);
     $images = $multiSizeImage->processImage($pathFile);
-    dump("pathFile24");
-    dd($images);
+    Log::critical("pathFile24");
     $imageDetails = array();
 
     foreach ($images as $image) {
@@ -298,26 +297,26 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 
         if (str_contains($imageNameWithExtention, 'lg')) {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@lg' . '.webp');
-            dump("pathFile25");
-            dump($output);
+            Log::critical("pathFile25");
+            Log::critical($output);
             $type .= 'large';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'md')) {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@md' . '.webp');
-            dump("pathFile26");
-            dump($output);
+            Log::critical("pathFile26");
+            Log::critical($output);
             $type .= 'medium';
             convertToWebp($image, $output);
         } else if (str_contains($imageNameWithExtention, 'sm')) {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@sm' . '.webp');
-            dump("pathFile27");
-            dump($output);
+            Log::critical("pathFile27");
+            Log::critical($output);
             $type .= 'small';
             convertToWebp($image, $output);
         } else {
             $output .= storage_path('app/public/files/' . $directory . '/' . $fileName . time() . '@tb' . '.webp');
-            dump("pathFile28");
-            dump($output);
+            Log::critical("pathFile28");
+            Log::critical($output);
             $type .= 'thumbnail';
             convertToWebp($image, $output);
         }
@@ -329,8 +328,8 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             "image_url" => substr($image, 33),
             "name" => $fileName
         ];
-        dump("pathFile29");
-        dump($dataImage);
+        Log::critical("pathFile29");
+        Log::critical($dataImage);
         $dataWebp = [
             "size" => Storage::size(substr($output, 21)),
             "extention" => File::extension(substr($output, 21)),
@@ -338,15 +337,15 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             "image_url" => substr($output, 33),
             "name" => $fileName
         ];
-        dump("pathFile30");
-        dump($dataWebp);
+        Log::critical("pathFile30");
+        Log::critical($dataWebp);
 
         $dataImages = [
             "webp" => $dataWebp,
             "image" => $dataImage
         ];
-        dump("pathFile31");
-        dump($dataImages);
+        Log::critical("pathFile31");
+        Log::critical($dataImages);
 
         $imageDetails = [$dataImages, ...$imageDetails];
     }
