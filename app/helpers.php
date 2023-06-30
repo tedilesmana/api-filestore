@@ -254,6 +254,18 @@ function deleteImage($image_url)
 function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 {
     $reducePath = env('REDUCE_PATH');
+    Log::critical($reducePath);
+    Log::critical($reducePath);
+    Log::critical($reducePath);
+    Log::critical($reducePath);
+    Log::critical($reducePath);
+    Log::critical($reducePath);
+    Log::critical($reducePath);
+    Log::critical($reducePath);
+    Log::critical($reducePath);
+    Log::critical($reducePath);
+    Log::critical($reducePath);
+    Log::critical($reducePath);
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
             '-m85',
