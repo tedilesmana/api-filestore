@@ -254,6 +254,8 @@ function deleteImage($image_url)
 function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 {
     $reducePath = env('REDUCE_PATH');
+    dd($reducePath);
+
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
             '-m85',
