@@ -14,10 +14,12 @@ php artisan make:migration alter_table_users_change_pin_number --table=users
 php artisan make:migration add_column_menu_to_routes_table --table=routes
 php artisan make:migration drop_column_image_url_in_categories_table --table=categories
 php artisan make:migration rename_table_promotions_to_owner_promotions --table=promotions
-php artisan make:migration create_master_lov_values_table --create=master_lov_values
+php artisan make:migration create_roles_table --create=roles
+php artisan make:migration create_permissions_table --create=permissions
 php artisan make:migration create_modules_table --create=modules
 
-php artisan make:controller Api/Menu/MenuController -r
+php artisan make:controller Api/Role/RoleController -r
+php artisan make:controller Api/Permission/PermissionController -r
 
 
 update server

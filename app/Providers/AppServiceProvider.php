@@ -27,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
             'Menu',
             'SubMenu',
             'AdditionalMenu',
+            'Role',
+            'Permission',
         );
 
         foreach ($models as $model) {

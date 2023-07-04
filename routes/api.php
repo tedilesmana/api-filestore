@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\Hris\WorkingShiftController;
 use App\Http\Controllers\Api\MasterLovGroup\MasterLovGroupController;
 use App\Http\Controllers\Api\MasterLovValue\MasterLovValueController;
 use App\Http\Controllers\Api\Menu\MenuController;
+use App\Http\Controllers\Api\Permission\PermissionController;
+use App\Http\Controllers\Api\Role\RoleController;
 use App\Http\Controllers\Api\Route\RouteController;
 use App\Http\Controllers\Api\Seeder\SeederDbController;
 use App\Http\Controllers\Api\SubMenu\SubMenuController;
@@ -78,4 +80,6 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('additional-menu', AdditionalMenuController::class);
     Route::resource('master-lov-value', MasterLovValueController::class);
     Route::resource('master-lov-group', MasterLovGroupController::class);
+    Route::resource('role', RoleController::class);
+    Route::resource('permission', PermissionController::class);
 });

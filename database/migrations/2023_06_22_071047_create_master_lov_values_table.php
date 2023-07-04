@@ -21,7 +21,7 @@ class CreateMasterLovValuesTable extends Migration
             $table->string('group_name')->nullable();
             $table->string('values')->nullable();
             $table->timestamps();
-            $table->softDeletes();
+            $table->softDeletes(); 
         });
     }
 

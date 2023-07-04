@@ -23,8 +23,8 @@ class CreateSubMenusTable extends Migration
             $table->string('title')->nullable();
             $table->string('sub_title')->nullable();
             $table->string('path')->nullable();
-            $table->string('icon_url')->nullable();
-            $table->string('access_permissions')->nullable();
+            $table->longText('icon_url')->nullable();
+            $table->longText('access_permissions')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
