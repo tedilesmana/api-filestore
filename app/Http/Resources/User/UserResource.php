@@ -24,7 +24,7 @@ class UserResource extends JsonResource
 
         $role = [];
 
-        if ($this->dlbEmployee) {
+        if (str_contains($this->email, 'lecturer.paramadina.ac.id')) {
             $result = RoleUser::updateOrCreate([
                 'user_id' => $this->id,
                 'role_id' => 2
