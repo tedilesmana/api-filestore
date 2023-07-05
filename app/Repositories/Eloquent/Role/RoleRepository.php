@@ -7,6 +7,7 @@ use App\Http\Resources\Role\RoleResource;
 use App\Models\Role;
 use App\Models\RoleUser;
 use App\Repositories\Interfaces\Role\RoleRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class RoleRepository implements RoleRepositoryInterface
 {
@@ -128,17 +129,22 @@ class RoleRepository implements RoleRepositoryInterface
 
     public function delete($id)
     {
+        DB::beginTransaction();
         $result = Role::find($id);
 
         if ($result) {
             $result->delete();
+            $resultRoleUser = RoleUser::where('role_id', $id)->delete();
 
-            if ($result) {
+            if ($result && $resultRoleUser) {
+                DB::commit();
                 return $this->apiController->trueResult("Data role berhasil di hapus", (object) ["data" => new RoleResource($result), "pagination" => null]);
             } else {
+                DB::rollBack();
                 return $this->apiController->falseResult("Data role gagal di hapus", null);
             }
         } else {
+            DB::rollBack();
             return $this->apiController->falseResult("Data role tidak di temukan", null);
         }
     }
