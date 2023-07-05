@@ -133,8 +133,8 @@ class RoleRepository implements RoleRepositoryInterface
         $result = Role::find($id);
 
         if ($result) {
-            $result->delete();
             $resultRoleUser = RoleUser::where('role_id', $id)->delete();
+            $result->delete();
 
             if ($result && $resultRoleUser) {
                 DB::commit();
