@@ -6,6 +6,7 @@ interface RoleRepositoryInterface
 {
     public function addRoleUser($request);
     public function deleteRoleUser($request);
+    public function deleteAllRoleUser($request);
     public function getAll($request);
     public function getById($id);
     public function create($request);

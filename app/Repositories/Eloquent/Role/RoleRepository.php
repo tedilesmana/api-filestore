@@ -45,6 +45,17 @@ class RoleRepository implements RoleRepositoryInterface
         }
     }
 
+    public function deleteAllRoleUser($request)
+    {
+        $result = RoleUser::where('role_id', $request->role_id)->delete();
+
+        if ($result) {
+            return $this->apiController->trueResult("Data role user berhasil di hapus", (object) ["data" => $result, "pagination" => null]);
+        } else {
+            return $this->apiController->falseResult("Data role user gagal di hapus", null);
+        }
+    }
+
     public function getAll($request)
     {
         $data_item = Role::first();

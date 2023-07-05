@@ -82,6 +82,7 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('master-lov-group', MasterLovGroupController::class);
     Route::post('role/add-role-user', [RoleController::class, 'addRoleUser']);
     Route::delete('role/delete-role-user', [RoleController::class, 'deleteRoleUser']);
+    Route::delete('role/delete-all-role-user', [RoleController::class, 'deleteAllRoleUser']);
     Route::resource('role', RoleController::class);
     Route::resource('permission', PermissionController::class);
 });
