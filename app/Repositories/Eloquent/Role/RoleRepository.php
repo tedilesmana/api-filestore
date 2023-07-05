@@ -133,10 +133,13 @@ class RoleRepository implements RoleRepositoryInterface
         $result = Role::find($id);
 
         if ($result) {
-            $resultRoleUser = RoleUser::where('role_id', $id)->delete();
+            $itemRoleUser = RoleUser::where('role_id', $id)->first();
+            if ($itemRoleUser) {
+                RoleUser::where('role_id', $id)->delete();
+            }
             $result->delete();
 
-            if ($result && $resultRoleUser) {
+            if ($result) {
                 DB::commit();
                 return $this->apiController->trueResult("Data role berhasil di hapus", (object) ["data" => new RoleResource($result), "pagination" => null]);
             } else {
