@@ -136,17 +136,17 @@ class AuthRepository implements AuthRepositoryInterface
             $tbl_user_auth = User::where("email", $request->email)->first();
             if (!is_null($tbl_user_auth->employee)) {
                 if ($tbl_user_auth->employee->is_active == 0) {
-                    return $this->apiController->falseResult("Akun kamu sudah tidak aktif", null);
+                    return $this->apiController->falseResult("Akun staff kamu sudah tidak aktif", null);
                 }
             }
             if (!is_null($tbl_user_auth->dlbEmployee)) {
                 if ($tbl_user_auth->dlbEmployee->is_active == 0) {
-                    return $this->apiController->falseResult("Akun kamu sudah tidak aktif", null);
+                    return $this->apiController->falseResult("Akun dlb kamu sudah tidak aktif", null);
                 }
             }
             if (!is_null($tbl_user_auth->student)) {
                 if (Carbon::now()->startOfDay()->gte($tbl_user_auth->student->tanggal_lulus)) {
-                    return $this->apiController->falseResult("Akun kamu sudah tidak aktif", null);
+                    return $this->apiController->falseResult("Akun mahasiswa kamu sudah tidak aktif", null);
                 }
             }
 
