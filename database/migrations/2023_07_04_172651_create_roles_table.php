@@ -18,7 +18,6 @@ class CreateRolesTable extends Migration
             $table->char('role_code', 35)->unique();
             $table->string('description')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
