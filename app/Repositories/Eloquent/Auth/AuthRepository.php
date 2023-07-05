@@ -5,15 +5,16 @@ namespace App\Repositories\Eloquent\Auth;
 use App\Models\User;
 use App\Http\Controllers\BaseController;
 use App\Http\Resources\Jabatan\MasterJabatanResource;
+use App\Http\Resources\Jabatan\RoleResource;
 use App\Http\Resources\User\UserResource;
 use App\Models\Employee;
 use App\Models\MasterJabatan;
+use App\Models\Role;
 use App\Models\UserDetail;
 use App\Repositories\Interfaces\Auth\AuthRepositoryInterface;
 use App\Services\MessageGatewayService;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 
@@ -30,6 +31,7 @@ class AuthRepository implements AuthRepositoryInterface
 
     public function listJabatan($request)
     {
+        $data_roles = RoleResource::collection(Role::get());
         $data_item = MasterJabatan::first();
         $columns = $data_item ? array_keys($data_item->toArray()) : [];
         $queryFilter = setQueryList($request, $columns, 'acajbt_uid');
@@ -41,7 +43,7 @@ class AuthRepository implements AuthRepositoryInterface
             ->paginate($request->limit ?? 10);
 
         if ($results) {
-            return $this->apiController->trueResult("Data user berhasil di temukan", (object) ["data" => MasterJabatanResource::collection($results), "pagination" => setPagination($results)]);
+            return $this->apiController->trueResult("Data user berhasil di temukan", (object) ["data" => [...$data_roles, ...MasterJabatanResource::collection($results)], "pagination" => setPagination($results)]);
         } else {
             return $this->apiController->falseResult("Data user gagal di ambil", null);
         }
@@ -132,6 +134,21 @@ class AuthRepository implements AuthRepositoryInterface
 
         if (str_contains($request->email, 'paramadina.ac.id')) {
             $tbl_user_auth = User::where("email", $request->email)->first();
+            if (!is_null($tbl_user_auth->employee)) {
+                if ($tbl_user_auth->employee->is_active == 0) {
+                    return $this->apiController->falseResult("Akun kamu sudah tidak aktif", null);
+                }
+            }
+            if (!is_null($tbl_user_auth->dlbEmployee)) {
+                if ($tbl_user_auth->dlbEmployee->is_active == 0) {
+                    return $this->apiController->falseResult("Akun kamu sudah tidak aktif", null);
+                }
+            }
+            if (!is_null($tbl_user_auth->student)) {
+                if (Carbon::now()->startOfDay()->gte($tbl_user_auth->student->tanggal_lulus)) {
+                    return $this->apiController->falseResult("Akun kamu sudah tidak aktif", null);
+                }
+            }
 
             if (strlen(is_null($tbl_user_auth->device_id) ? "" : $tbl_user_auth->device_id) == 0) {
                 $input = [];

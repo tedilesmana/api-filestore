@@ -4,7 +4,7 @@ namespace App\Http\Resources\Jabatan;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MasterJabatanResource extends JsonResource
+class RoleResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,8 +15,8 @@ class MasterJabatanResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => null,
-            'acajbt_uid' => $this->acajbt_uid,
+            'id' => $this->id,
+            'acajbt_uid' => $this->role_code,
             'description' => $this->description,
         ];
     }

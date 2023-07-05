@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent\Role;
 use App\Http\Controllers\BaseController;
 use App\Http\Resources\Role\RoleResource;
 use App\Models\Role;
+use App\Models\RoleUser;
 use App\Repositories\Interfaces\Role\RoleRepositoryInterface;
 
 class RoleRepository implements RoleRepositoryInterface
@@ -14,6 +15,34 @@ class RoleRepository implements RoleRepositoryInterface
     public function __construct(BaseController $apiController)
     {
         $this->apiController = $apiController;
+    }
+
+    public function addRoleUser($request)
+    {
+        $result = RoleUser::updateOrCreate([
+            'user_id' => $request->user_id,
+            'role_id' => $request->role_id,
+        ], [
+            'user_id' => $request->user_id,
+            'role_id' => $request->role_id,
+        ]);
+
+        if ($result) {
+            return $this->apiController->trueResult("Data role user berhasil di simpan", (object) ["data" => $result, "pagination" => null]);
+        } else {
+            return $this->apiController->falseResult("Data role user gagal di simpan", null);
+        }
+    }
+
+    public function deleteRoleUser($request)
+    {
+        $result = RoleUser::where('user_id', $request->user_id)->where('role_id', $request->role_id)->delete();
+
+        if ($result) {
+            return $this->apiController->trueResult("Data role user berhasil di hapus", (object) ["data" => $result, "pagination" => null]);
+        } else {
+            return $this->apiController->falseResult("Data role user gagal di hapus", null);
+        }
     }
 
     public function getAll($request)

@@ -12,4 +12,9 @@ class Role extends Model
     use HasFactory;
     const CODE = 'A1-ROLES';
     protected $guarded = array('id');
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
 }
