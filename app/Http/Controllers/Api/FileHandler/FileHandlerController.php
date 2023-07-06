@@ -11,6 +11,81 @@ use Illuminate\Support\Facades\Storage;
 
 class FileHandlerController extends BaseController
 {
+    public function deleteFileInS3(Request $request)
+    {
+        try {
+            $images = '[
+                {
+                    "extention": "png",
+                    "type": "thumbnail",
+                    "image_url": "https://sip-data-storage.s3.ap-southeast-1.amazonaws.com/png/thumbnail/tes33/logo-paramadina-white%230607230227.png",
+                    "name": "logo-paramadina-white"
+                },
+                {
+                    "extention": "webp",
+                    "type": "thumbnail",
+                    "image_url": "https://sip-data-storage.s3.ap-southeast-1.amazonaws.com/webp/thumbnail/tes33/logo-paramadina-white%230607230227.webp",
+                    "name": "logo-paramadina-white"
+                },
+                {
+                    "extention": "png",
+                    "type": "small",
+                    "image_url": "https://sip-data-storage.s3.ap-southeast-1.amazonaws.com/png/small/tes33/logo-paramadina-white%230607230227.png",
+                    "name": "logo-paramadina-white"
+                },
+                {
+                    "extention": "webp",
+                    "type": "small",
+                    "image_url": "https://sip-data-storage.s3.ap-southeast-1.amazonaws.com/webp/small/tes33/logo-paramadina-white%230607230227.webp",
+                    "name": "logo-paramadina-white"
+                },
+                {
+                    "extention": "png",
+                    "type": "medium",
+                    "image_url": "https://sip-data-storage.s3.ap-southeast-1.amazonaws.com/png/medium/tes33/logo-paramadina-white%230607230227.png",
+                    "name": "logo-paramadina-white"
+                },
+                {
+                    "extention": "webp",
+                    "type": "medium",
+                    "image_url": "https://sip-data-storage.s3.ap-southeast-1.amazonaws.com/webp/medium/tes33/logo-paramadina-white%230607230227.webp",
+                    "name": "logo-paramadina-white"
+                },
+                {
+                    "extention": "png",
+                    "type": "large",
+                    "image_url": "https://sip-data-storage.s3.ap-southeast-1.amazonaws.com/png/large/tes33/logo-paramadina-white%230607230227.png",
+                    "name": "logo-paramadina-white"
+                },
+                {
+                    "extention": "webp",
+                    "type": "large",
+                    "image_url": "https://sip-data-storage.s3.ap-southeast-1.amazonaws.com/webp/large/tes33/logo-paramadina-white%230607230227.webp",
+                    "name": "logo-paramadina-white"
+                }
+            ]';
+            $arrImage = json_decode($images);
+            $result = [];
+            foreach ($arrImage as $key => $value) {
+                $fullPath = $value->image_url;
+                $lengthBaseUrlS3 = strlen('https://sip-data-storage.s3.ap-southeast-1.amazonaws.com/');
+                $cutPath = substr($fullPath, $lengthBaseUrlS3);
+                $path = str_replace('%23', '#', $cutPath);
+                $response = Storage::disk('s3')->delete($path);
+                $itemResult = [
+                    "image_url" => $fullPath,
+                    "status" => $response
+                ];
+
+                $result = [...$result, $itemResult];
+            }
+
+            return $this->successResponse("Image berhasil di simpan", $result);
+        } catch (\Throwable $th) {
+            return $this->badResponse("Image berhasil di simpan", $th);
+        }
+    }
+
     public function uploadFileToLocal(Request $request)
     {
         $guessExtension = $request->file('file')->guessExtension();

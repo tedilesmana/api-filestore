@@ -70,6 +70,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('gateway-manager/add-request', [GatewayManagerController::class, 'addRequest']);
     Route::resource('gateway-manager', GatewayManagerController::class);
     Route::resource('settings', SettingController::class);
+    Route::post('delete/file/s3', [FileHandlerController::class, 'deleteFileInS3']);
     Route::post('upload/file/local', [FileHandlerController::class, 'uploadFileToLocal']);
     Route::post('upload/file/s3', [FileHandlerController::class, 'uploadFileToS3']);
     Route::post('upload/file/resize', [FileHandlerController::class, 'uploadFileResize']);
