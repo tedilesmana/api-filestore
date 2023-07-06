@@ -134,21 +134,35 @@ class AuthRepository implements AuthRepositoryInterface
 
         if (str_contains($request->email, 'paramadina.ac.id')) {
             $tbl_user_auth = User::where("email", $request->email)->first();
+            $isActiveEmployee = false;
+            $isActiveDlbEmployee = false;
+            $isActiveStudent = false;
+
             if (!is_null($tbl_user_auth->employee)) {
                 if ($tbl_user_auth->employee->is_active == 0) {
-                    return $this->apiController->falseResult("Akun staff kamu sudah tidak aktif", null);
+                    $isActiveEmployee = false;
+                    // return $this->apiController->falseResult("Akun staff kamu sudah tidak aktif", null);
+                } else {
+                    $isActiveEmployee = true;
                 }
             }
             if (!is_null($tbl_user_auth->dlbEmployee)) {
                 if ($tbl_user_auth->dlbEmployee->is_active == 0) {
-                    return $this->apiController->falseResult("Akun dlb kamu sudah tidak aktif", null);
+                    $isActiveDlbEmployee = false;
+                    // return $this->apiController->falseResult("Akun dlb kamu sudah tidak aktif", null);
+                } else {
+                    $isActiveDlbEmployee = true;
                 }
             }
             if (!is_null($tbl_user_auth->student)) {
                 if (Carbon::now()->startOfDay()->gte($tbl_user_auth->student->tanggal_lulus)) {
-                    return $this->apiController->falseResult("Akun mahasiswa kamu sudah tidak aktif", null);
+                    $isActiveStudent = false;
+                    // return $this->apiController->falseResult("Akun mahasiswa kamu sudah tidak aktif", null);
+                } else {
+                    $isActiveStudent = true;
                 }
             }
+            $isHaveAccountActive = $isActiveEmployee || $isActiveDlbEmployee || $isActiveDlbEmployee;
 
             if (strlen(is_null($tbl_user_auth->device_id) ? "" : $tbl_user_auth->device_id) == 0) {
                 $input = [];
