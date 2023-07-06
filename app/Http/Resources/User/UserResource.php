@@ -18,6 +18,7 @@ class UserResource extends JsonResource
      */
     public function toArray($request)
     {
+        //File Upload Tes
         $havaStudent = !(is_null($this->student));
         $haveMhs =  $havaStudent ? !(is_null($this->student->mahasiswa)) : false;
         $id_mahasiswa = $havaStudent && $haveMhs ? $this->student->mahasiswa->id : null;
