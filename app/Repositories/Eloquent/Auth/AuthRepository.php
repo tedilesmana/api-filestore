@@ -141,7 +141,6 @@ class AuthRepository implements AuthRepositoryInterface
             if (!is_null($tbl_user_auth->employee)) {
                 if ($tbl_user_auth->employee->is_active == 0) {
                     $isActiveEmployee = false;
-                    // return $this->apiController->falseResult("Akun staff kamu sudah tidak aktif", null);
                 } else {
                     $isActiveEmployee = true;
                 }
@@ -149,7 +148,6 @@ class AuthRepository implements AuthRepositoryInterface
             if (!is_null($tbl_user_auth->dlbEmployee)) {
                 if ($tbl_user_auth->dlbEmployee->is_active == 0) {
                     $isActiveDlbEmployee = false;
-                    // return $this->apiController->falseResult("Akun dlb kamu sudah tidak aktif", null);
                 } else {
                     $isActiveDlbEmployee = true;
                 }
@@ -157,24 +155,57 @@ class AuthRepository implements AuthRepositoryInterface
             if (!is_null($tbl_user_auth->student)) {
                 if (Carbon::now()->startOfDay()->gte($tbl_user_auth->student->tanggal_lulus)) {
                     $isActiveStudent = false;
-                    // return $this->apiController->falseResult("Akun mahasiswa kamu sudah tidak aktif", null);
                 } else {
                     $isActiveStudent = true;
                 }
             }
-            $isHaveAccountActive = $isActiveEmployee || $isActiveDlbEmployee || $isActiveDlbEmployee;
 
-            if (strlen(is_null($tbl_user_auth->device_id) ? "" : $tbl_user_auth->device_id) == 0) {
-                $input = [];
-                $input['device_id'] = $request->device_id;
+            $isHaveAccountActive = $isActiveEmployee || $isActiveDlbEmployee || $isActiveStudent;
 
-                $tbl_user_auth = User::updateOrCreate([
-                    'email'   => $request['email'],
-                ], $input);
-            }
+            if (!$isHaveAccountActive) {
+                return $this->apiController->falseResult("Kamu tidak mempunyai akun aktif", null);
+            } else {
+                if (strlen(is_null($tbl_user_auth->device_id) ? "" : $tbl_user_auth->device_id) == 0) {
+                    $input = [];
+                    $input['device_id'] = $request->device_id;
 
-            if ($request->login_by == "google") {
-                if ($tbl_user_auth->google_id) {
+                    $tbl_user_auth = User::updateOrCreate([
+                        'email'   => $request['email'],
+                    ], $input);
+                }
+
+                if ($request->login_by == "google") {
+                    if ($tbl_user_auth->google_id) {
+                        if ($request->device_id == $tbl_user_auth->device_id) {
+                            $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
+                            return $this->apiController->trueResult("Selamat datang kembali", $data);
+                        } else if ($request->device_id == "Website") {
+                            $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
+                            return $this->apiController->trueResult("Selamat datang kembali", $data);
+                        } else {
+                            return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
+                        }
+                    } else {
+                        $input = [];
+                        $input['google_password'] = Hash::make($password);
+                        $input['google_id'] = $request->google_id;
+                        $input['device_id'] = $request->device_id;
+
+                        $tbl_user_auth = User::updateOrCreate([
+                            'email'   => $request['email'],
+                        ], $input);
+
+                        if ($tbl_user_auth->device_id == $request->device_id) {
+                            $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
+                            return $this->apiController->trueResult("Selamat datang kembali", $data);
+                        } else if ($request->device_id == "Website") {
+                            $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
+                            return $this->apiController->trueResult("Selamat datang kembali", $data);
+                        } else {
+                            return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
+                        }
+                    }
+                } else {
                     if ($request->device_id == $tbl_user_auth->device_id) {
                         $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
                         return $this->apiController->trueResult("Selamat datang kembali", $data);
@@ -184,35 +215,6 @@ class AuthRepository implements AuthRepositoryInterface
                     } else {
                         return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
                     }
-                } else {
-                    $input = [];
-                    $input['google_password'] = Hash::make($password);
-                    $input['google_id'] = $request->google_id;
-                    $input['device_id'] = $request->device_id;
-
-                    $tbl_user_auth = User::updateOrCreate([
-                        'email'   => $request['email'],
-                    ], $input);
-
-                    if ($tbl_user_auth->device_id == $request->device_id) {
-                        $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
-                        return $this->apiController->trueResult("Selamat datang kembali", $data);
-                    } else if ($request->device_id == "Website") {
-                        $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
-                        return $this->apiController->trueResult("Selamat datang kembali", $data);
-                    } else {
-                        return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
-                    }
-                }
-            } else {
-                if ($request->device_id == $tbl_user_auth->device_id) {
-                    $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
-                    return $this->apiController->trueResult("Selamat datang kembali", $data);
-                } else if ($request->device_id == "Website") {
-                    $data = ["auth" => $this->createToken($tbl_user_auth->username, $password), "user" => new UserResource($tbl_user_auth)];
-                    return $this->apiController->trueResult("Selamat datang kembali", $data);
-                } else {
-                    return $this->apiController->falseResult("Mohon masuk melalui device yang terdaftar", null);
                 }
             }
         } else {
