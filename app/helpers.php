@@ -13,6 +13,31 @@ use Spatie\ImageOptimizer\Optimizers\Pngquant;
 use Spatie\ImageOptimizer\Optimizers\Svgo;
 use WebPConvert\WebPConvert;
 
+function deleteFileInS3($imagesString)
+{
+    try {
+        $arrImage = json_decode($imagesString);
+        $result = [];
+        foreach ($arrImage as $key => $value) {
+            $fullPath = $value->image_url;
+            $lengthBaseUrlS3 = strlen('https://sip-data-storage.s3.ap-southeast-1.amazonaws.com/');
+            $cutPath = substr($fullPath, $lengthBaseUrlS3);
+            $path = str_replace('%23', '#', $cutPath);
+            $response = Storage::disk('s3')->delete($path);
+            $itemResult = [
+                "image_url" => $fullPath,
+                "status" => $response
+            ];
+
+            $result = [...$result, $itemResult];
+        }
+
+        return true;
+    } catch (\Throwable $th) {
+        return false;
+    }
+}
+
 function generalDateFormat($date)
 {
     return Carbon::parse($date)->format('d M Y');

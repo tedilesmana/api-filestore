@@ -75,7 +75,8 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             $input["slug"] = Str::slug($request->name);
             $input["body"] = json_encode($request->body);
             $input["params"] = json_encode($request->params);
-            $input["headers"] = json_encode($request->headers);
+            unset($input["data_headers"]);
+            $input["headers"] = json_encode($request->data_headers);
             $input["authorization"] = json_encode($request->authorization);
             $input["created_at"] = Carbon::now();
             $input["updated_at"] = Carbon::now();
@@ -184,7 +185,8 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             $input["link_api_gateway"] = "{$base_url}/api/gateway-manager/{$applicationItem->slug}/{$moduleItem->slug}/{$featureItem->slug}/{$input["slug"]}" . $ids;
             $input["body"] = json_encode($request->body);
             $input["params"] = json_encode($request->params);
-            $input["headers"] = json_encode($request->headers);
+            unset($input["data_headers"]);
+            $input["headers"] = json_encode($request->data_headers);
             $input["authorization"] = json_encode($request->authorization);
             $input["updated_at"] = Carbon::now();
             unset($input["ids"]);

@@ -18,7 +18,7 @@ class CreateApplicationsTable extends Migration
             $table->string('name')->unique();
             $table->string('description');
             $table->string('base_url');
-            $table->string('image_url')->nullable();
+            $table->longText('image_url')->nullable();
             $table->string('slug');
             $table->string('token')->unique();
             $table->timestamps();

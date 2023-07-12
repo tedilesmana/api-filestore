@@ -7,6 +7,7 @@ use App\Http\Resources\Global\GlobarResource;
 use App\Models\Application;
 use App\Repositories\Interfaces\GatewayApplication\GatewayApplicationRepositoryInterface;
 use App\Services\MessageGatewayService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -54,7 +55,7 @@ class GatewayApplicationRepository implements GatewayApplicationRepositoryInterf
     public function create($request)
     {
         $input = $request->all();
-        $results = Application::create($input); 
+        $results = Application::create($input);
 
         if ($results) {
             return $this->apiController->trueResult("Data applikasi berhasil di buat", (object) ["data" => $results, "pagination" => null]);
@@ -65,46 +66,69 @@ class GatewayApplicationRepository implements GatewayApplicationRepositoryInterf
 
     public function update($request, $id)
     {
-        $application = Application::find($id);
-
-        if ($application) {
-            $application->name = $request->name;
-            $application->description = $request->description;
-            $application->base_url = $request->base_url;
-            $application->image_url = $request->image_url;
-            $application->slug = Str::slug($request->name);
-
-            if ($application->isClean()) {
-                return $this->apiController->falseResult('Tidak ada perubahan data yang anda masukan', null);
-            }
-
-            $application->save();
+        try {
+            DB::beginTransaction();
+            $application = Application::find($id);
+            $oldImage = $application->image_url;
 
             if ($application) {
-                return $this->apiController->trueResult("Data applikasi berhasil di update", (object) ["data" => $application, "pagination" => null]);
+                $application->name = $request->name;
+                $application->description = $request->description;
+                $application->base_url = $request->base_url;
+                $application->image_url = $request->image_url;
+                $application->slug = Str::slug($request->name);
+
+                if ($application->isClean()) {
+                    return $this->apiController->falseResult('Tidak ada perubahan data yang anda masukan', null);
+                }
+
+                $application->save();
+
+                if ($application) {
+                    if ($request->image_url != $oldImage) {
+                        deleteFileInS3($request->image_url);
+                    };
+                    DB::commit();
+                    return $this->apiController->trueResult("Data applikasi berhasil di update", (object) ["data" => $application, "pagination" => null]);
+                } else {
+                    DB::rollBack();
+                    return $this->apiController->falseResult("Data applikasi gagal di update", null);
+                }
             } else {
+                DB::rollBack();
                 return $this->apiController->falseResult("Data applikasi gagal di update", null);
             }
-        } else {
-            return $this->apiController->falseResult("Data applikasi gagal di update", null);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return $this->apiController->falseResult("Request error", null);
         }
     }
 
     public function delete($id)
     {
-        $application = Application::find($id);
-
-        if ($application) {
-            Schema::dropIfExists($application->slug);
-            $application->delete();
+        try {
+            DB::beginTransaction();
+            $application = Application::find($id);
 
             if ($application) {
-                return $this->apiController->trueResult("Data applikasi berhasil di hapus", (object) ["data" => $application, "pagination" => null]);
+                Schema::dropIfExists($application->slug);
+                $application->delete();
+
+                if ($application) {
+                    deleteFileInS3($application->image_url);
+                    DB::commit();
+                    return $this->apiController->trueResult("Data applikasi berhasil di hapus", (object) ["data" => $application, "pagination" => null]);
+                } else {
+                    DB::rollBack();
+                    return $this->apiController->falseResult("Data applikasi gagal di hapus", null);
+                }
             } else {
+                DB::rollBack();
                 return $this->apiController->falseResult("Data applikasi gagal di hapus", null);
             }
-        } else {
-            return $this->apiController->falseResult("Data applikasi gagal di hapus", null);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return $this->apiController->falseResult("Request error", null);
         }
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\BaseController;
 use App\Http\Resources\Menu\RouteResource;
 use App\Models\Route;
 use App\Repositories\Interfaces\Route\RouteRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class RouteRepository implements RouteRepositoryInterface
 {
@@ -65,46 +66,69 @@ class RouteRepository implements RouteRepositoryInterface
 
     public function update($request, $id)
     {
-        $result = Route::find($id);
-
-        if ($result) {
-            $result->name = $request->name;
-            $result->title = $request->title;
-            $result->sub_title = $request->sub_title;
-            $result->path = $request->path;
-            $result->icon_url = $request->icon_url;
-            $result->access_permissions = $request->access_permissions;
-
-            if ($result->isClean()) {
-                return $this->apiController->falseResult("Tidak ada perubahan data yang anda masukan", null);
-            }
-
-            $result->save();
+        try {
+            DB::beginTransaction();
+            $result = Route::find($id);
+            $oldImage = $result->icon_url;
 
             if ($result) {
-                return $this->apiController->trueResult("Data route berhasil di update", (object) ["data" => new RouteResource($result), "pagination" => null]);
+                $result->name = $request->name;
+                $result->title = $request->title;
+                $result->sub_title = $request->sub_title;
+                $result->path = $request->path;
+                $result->icon_url = $request->icon_url;
+                $result->access_permissions = $request->access_permissions;
+
+                if ($result->isClean()) {
+                    return $this->apiController->falseResult("Tidak ada perubahan data yang anda masukan", null);
+                }
+
+                $result->save();
+
+                if ($result) {
+                    if ($request->icon_url != $oldImage) {
+                        deleteFileInS3($request->image_url);
+                    };
+                    DB::commit();
+                    return $this->apiController->trueResult("Data route berhasil di update", (object) ["data" => new RouteResource($result), "pagination" => null]);
+                } else {
+                    DB::rollBack();
+                    return $this->apiController->falseResult("Data route gagal di update", null);
+                }
             } else {
-                return $this->apiController->falseResult("Data route gagal di update", null);
+                DB::rollBack();
+                return $this->apiController->falseResult("Data route tidak di temukan", null);
             }
-        } else {
-            return $this->apiController->falseResult("Data route tidak di temukan", null);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return $this->apiController->falseResult("Request error", $th);
         }
     }
 
     public function delete($id)
     {
-        $result = Route::find($id);
-
-        if ($result) {
-            $result->delete();
+        try {
+            DB::beginTransaction();
+            $result = Route::find($id);
 
             if ($result) {
-                return $this->apiController->trueResult("Data route berhasil di hapus", (object) ["data" => new RouteResource($result), "pagination" => null]);
+                $result->delete();
+
+                if ($result) {
+                    deleteFileInS3($result->icon_url);
+                    DB::commit();
+                    return $this->apiController->trueResult("Data route berhasil di hapus", (object) ["data" => new RouteResource($result), "pagination" => null]);
+                } else {
+                    DB::rollBack();
+                    return $this->apiController->falseResult("Data route gagal di hapus", null);
+                }
             } else {
-                return $this->apiController->falseResult("Data route gagal di hapus", null);
+                DB::rollBack();
+                return $this->apiController->falseResult("Data route tidak di temukan", null);
             }
-        } else {
-            return $this->apiController->falseResult("Data route tidak di temukan", null);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return $this->apiController->falseResult("Request error", $th->getMessage());
         }
     }
 }

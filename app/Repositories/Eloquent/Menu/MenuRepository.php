@@ -6,6 +6,7 @@ use App\Http\Controllers\BaseController;
 use App\Http\Resources\Menu\MenuResource;
 use App\Models\Menu;
 use App\Repositories\Interfaces\Menu\MenuRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class MenuRepository implements MenuRepositoryInterface
 {
@@ -65,47 +66,70 @@ class MenuRepository implements MenuRepositoryInterface
 
     public function update($request, $id)
     {
-        $result = Menu::find($id);
-
-        if ($result) {
-            $input['route_id'] = $request->route_id;
-            $result->name = $request->name;
-            $result->title = $request->title;
-            $result->sub_title = $request->sub_title;
-            $result->path = $request->path;
-            $result->icon_url = $request->icon_url;
-            $result->access_permissions = $request->access_permissions;
-
-            if ($result->isClean()) {
-                return $this->apiController->falseResult("Tidak ada perubahan data yang anda masukan", null);
-            }
-
-            $result->save();
+        try {
+            DB::beginTransaction();
+            $result = Menu::find($id);
+            $oldImage = $result->icon_url;
 
             if ($result) {
-                return $this->apiController->trueResult("Data menu berhasil di update", (object) ["data" => new MenuResource($result), "pagination" => null]);
+                $input['route_id'] = $request->route_id;
+                $result->name = $request->name;
+                $result->title = $request->title;
+                $result->sub_title = $request->sub_title;
+                $result->path = $request->path;
+                $result->icon_url = $request->icon_url;
+                $result->access_permissions = $request->access_permissions;
+
+                if ($result->isClean()) {
+                    return $this->apiController->falseResult("Tidak ada perubahan data yang anda masukan", null);
+                }
+
+                $result->save();
+
+                if ($result) {
+                    if ($request->icon_url != $oldImage) {
+                        deleteFileInS3($request->image_url);
+                    };
+                    DB::commit();
+                    return $this->apiController->trueResult("Data menu berhasil di update", (object) ["data" => new MenuResource($result), "pagination" => null]);
+                } else {
+                    DB::rollBack();
+                    return $this->apiController->falseResult("Data menu gagal di update", null);
+                }
             } else {
-                return $this->apiController->falseResult("Data menu gagal di update", null);
+                DB::rollBack();
+                return $this->apiController->falseResult("Data menu tidak di temukan", null);
             }
-        } else {
-            return $this->apiController->falseResult("Data menu tidak di temukan", null);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return $this->apiController->falseResult("Request error", null);
         }
     }
 
     public function delete($id)
     {
-        $result = Menu::find($id);
-
-        if ($result) {
-            $result->delete();
+        try {
+            DB::beginTransaction();
+            $result = Menu::find($id);
 
             if ($result) {
-                return $this->apiController->trueResult("Data menu berhasil di hapus", (object) ["data" => new MenuResource($result), "pagination" => null]);
+                $result->delete();
+
+                if ($result) {
+                    deleteFileInS3($result->icon_url);
+                    DB::commit();
+                    return $this->apiController->trueResult("Data menu berhasil di hapus", (object) ["data" => new MenuResource($result), "pagination" => null]);
+                } else {
+                    DB::rollBack();
+                    return $this->apiController->falseResult("Data menu gagal di hapus", null);
+                }
             } else {
-                return $this->apiController->falseResult("Data menu gagal di hapus", null);
+                DB::rollBack();
+                return $this->apiController->falseResult("Data menu tidak di temukan", null);
             }
-        } else {
-            return $this->apiController->falseResult("Data menu tidak di temukan", null);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return $this->apiController->falseResult("Request error", null);
         }
     }
 }

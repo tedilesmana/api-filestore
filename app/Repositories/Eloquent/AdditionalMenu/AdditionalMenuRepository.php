@@ -6,6 +6,7 @@ use App\Http\Controllers\BaseController;
 use App\Http\Resources\Menu\AdditionalMenuResource;
 use App\Models\AdditionalMenu;
 use App\Repositories\Interfaces\AdditionalMenu\AdditionalMenuRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class AdditionalMenuRepository implements AdditionalMenuRepositoryInterface
 {
@@ -65,47 +66,70 @@ class AdditionalMenuRepository implements AdditionalMenuRepositoryInterface
 
     public function update($request, $id)
     {
-        $result = AdditionalMenu::find($id);
-
-        if ($result) {
-            $input['sub_menu_id'] = $request->sub_menu_id;
-            $result->name = $request->name;
-            $result->title = $request->title;
-            $result->sub_title = $request->sub_title;
-            $result->path = $request->path;
-            $result->icon_url = $request->icon_url;
-            $result->access_permissions = $request->access_permissions;
-
-            if ($result->isClean()) {
-                return $this->apiController->falseResult("Tidak ada perubahan data yang anda masukan", null);
-            }
-
-            $result->save();
+        try {
+            DB::beginTransaction();
+            $result = AdditionalMenu::find($id);
+            $oldImage = $result->icon_url;
 
             if ($result) {
-                return $this->apiController->trueResult("Data additional menu berhasil di update", (object) ["data" => new AdditionalMenuResource($result), "pagination" => null]);
+                $input['sub_menu_id'] = $request->sub_menu_id;
+                $result->name = $request->name;
+                $result->title = $request->title;
+                $result->sub_title = $request->sub_title;
+                $result->path = $request->path;
+                $result->icon_url = $request->icon_url;
+                $result->access_permissions = $request->access_permissions;
+
+                if ($result->isClean()) {
+                    return $this->apiController->falseResult("Tidak ada perubahan data yang anda masukan", null);
+                }
+
+                $result->save();
+
+                if ($result) {
+                    if ($request->icon_url != $oldImage) {
+                        deleteFileInS3($request->image_url);
+                    };
+                    DB::commit();
+                    return $this->apiController->trueResult("Data additinal menu berhasil di update", (object) ["data" => new AdditionalMenuResource($result), "pagination" => null]);
+                } else {
+                    DB::rollBack();
+                    return $this->apiController->falseResult("Data additinal menu gagal di update", null);
+                }
             } else {
-                return $this->apiController->falseResult("Data additional menu gagal di update", null);
+                DB::rollBack();
+                return $this->apiController->falseResult("Data additinal menu tidak di temukan", null);
             }
-        } else {
-            return $this->apiController->falseResult("Data additional menu tidak di temukan", null);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return $this->apiController->falseResult("Request error", null);
         }
     }
 
     public function delete($id)
     {
-        $result = AdditionalMenu::find($id);
-
-        if ($result) {
-            $result->delete();
+        try {
+            DB::beginTransaction();
+            $result = AdditionalMenu::find($id);
 
             if ($result) {
-                return $this->apiController->trueResult("Data additional menu berhasil di hapus", (object) ["data" => new AdditionalMenuResource($result), "pagination" => null]);
+                $result->delete();
+
+                if ($result) {
+                    deleteFileInS3($result->icon_url);
+                    DB::commit();
+                    return $this->apiController->trueResult("Data additional menu berhasil di hapus", (object) ["data" => new AdditionalMenuResource($result), "pagination" => null]);
+                } else {
+                    DB::rollBack();
+                    return $this->apiController->falseResult("Data additional menu gagal di hapus", null);
+                }
             } else {
-                return $this->apiController->falseResult("Data additional menu gagal di hapus", null);
+                DB::rollBack();
+                return $this->apiController->falseResult("Data additional menu tidak di temukan", null);
             }
-        } else {
-            return $this->apiController->falseResult("Data additional menu tidak di temukan", null);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return $this->apiController->falseResult("Request error", null);
         }
     }
 }
