@@ -82,13 +82,13 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             $input["ids"] = $request->ids;
             $input["created_at"] = Carbon::now();
             $input["updated_at"] = Carbon::now();
-            $listIds = $request->ids ?? [];
-            $ids = '';
-            for ($i = 0; $i < count($listIds); $i++) {
-                $ids = $ids . '/{' . $listIds[$i] . '}';
-            }
+            // $listIds = $request->ids ?? [];
+            // $ids = '';
+            // for ($i = 0; $i < count($listIds); $i++) {
+            //     $ids = $ids . '/{' . $listIds[$i] . '}';
+            // }
             // $input["link_api_gateway"] = "{$base_url}/gateway-manager-management/{$application->slug}/{$module->slug}/{$feature->slug}/{$input["slug"]}" . $ids;
-            unset($input["ids"]);
+            // unset($input["ids"]);
             $result = DB::table('app-' . $application->slug)->insert(
                 $input
             );
@@ -179,17 +179,18 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             // $base_url = env('APP_URL');
             $input = $request->all();
             $input["slug"] = Str::slug($request->name);
-            $listIds = $request->ids ?? [];
-            $ids = '';
-            for ($i = 0; $i < count($listIds); $i++) {
-                $ids = $ids . '/' . $listIds[$i];
-            }
+            // $listIds = $request->ids ?? [];
+            // $ids = '';
+            // for ($i = 0; $i < count($listIds); $i++) {
+            //     $ids = $ids . '/' . $listIds[$i];
+            // }
             // $input["link_api_gateway"] = "{$base_url}/gateway-manager-management/{$applicationItem->slug}/{$moduleItem->slug}/{$featureItem->slug}/{$input["slug"]}" . $ids;
             $input["body"] = $request->body;
             $input["params"] = $request->params;
             unset($input["data_headers"]);
             $input["headers"] = $request->data_headers;
             $input["authorization"] = $request->authorization;
+            $input["ids"] = $request->ids;
             $input["updated_at"] = Carbon::now();
             unset($input["ids"]);
 
