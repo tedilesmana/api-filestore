@@ -192,7 +192,6 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             $input["authorization"] = $request->authorization;
             $input["ids"] = $request->ids;
             $input["updated_at"] = Carbon::now();
-            unset($input["ids"]);
 
             $updateItem = DB::table('app-' . $app)->where("slug", $title)->update($input);
             return $this->apiController->trueResult("Update request berhasil di lakukan", $updateItem);
