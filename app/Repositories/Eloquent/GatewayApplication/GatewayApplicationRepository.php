@@ -53,7 +53,7 @@ class GatewayApplicationRepository implements GatewayApplicationRepositoryInterf
     public function create($request)
     {
         $input = $request->all();
-        $results = Application::create($input);
+        $results = Application::create($input); 
 
         if ($results) {
             return $this->apiController->trueResult("Data applikasi berhasil di buat", (object) ["data" => $results, "pagination" => null]);

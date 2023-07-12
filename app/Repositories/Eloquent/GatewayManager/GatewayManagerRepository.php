@@ -55,14 +55,17 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
                         ->onDelete('restrict');
                     $table->foreignId('feature_id')->constrained()
                         ->onUpdate('restrict')
-                        ->onDelete('restrict');
+                        ->onDelete('restrict'); 
                     $table->string('name')->unique();
                     $table->string('slug');
                     $table->string('description');
                     $table->string('link_api_application');
                     $table->string('link_api_gateway');
                     $table->string('methode');
-                    $table->string('payload')->nullable();
+                    $table->string('body')->nullable();
+                    $table->string('params')->nullable();
+                    $table->string('headers')->nullable();
+                    $table->string('authorization')->nullable();
                     $table->timestamps();
                 });
             }
@@ -70,13 +73,16 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             $base_url = env('APP_URL');
             $input = $request->all();
             $input["slug"] = Str::slug($request->name);
-            $input["payload"] = json_encode($request->payload);
+            $input["body"] = json_encode($request->body);
+            $input["params"] = json_encode($request->params);
+            $input["headers"] = json_encode($request->headers);
+            $input["authorization"] = json_encode($request->authorization);
             $input["created_at"] = Carbon::now();
             $input["updated_at"] = Carbon::now();
             $listIds = $request->ids ?? [];
             $ids = '';
             for ($i = 0; $i < count($listIds); $i++) {
-                $ids = $ids . '/' . $listIds[$i];
+                $ids = $ids . '/{' . $listIds[$i] . '}';
             }
             $input["link_api_gateway"] = "{$base_url}/api/gateway-manager/{$application->slug}/{$module->slug}/{$feature->slug}/{$input["slug"]}" . $ids;
             unset($input["ids"]);

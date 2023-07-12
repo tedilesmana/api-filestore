@@ -15,7 +15,6 @@ class CreateModulesTable extends Migration
     {
         Schema::create('modules', function (Blueprint $table) {
             $table->id();
-            $table->char('module_code', 35)->unique();
             $table->foreignId('application_id')->constrained()
                 ->onUpdate('restrict')
                 ->onDelete('restrict');

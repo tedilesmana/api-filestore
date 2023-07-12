@@ -15,12 +15,11 @@ class CreateFeaturesTable extends Migration
     {
         Schema::create('features', function (Blueprint $table) {
             $table->id();
-            $table->char('feature_code', 35)->unique();
             $table->foreignId('module_id')->constrained()
                 ->onUpdate('restrict')
                 ->onDelete('restrict');
             $table->string('name')->unique();
-            $table->string('description');
+            $table->string('description'); 
             $table->string('slug');
             $table->timestamps();
             $table->softDeletes();
