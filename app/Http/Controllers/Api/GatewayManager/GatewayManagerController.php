@@ -282,10 +282,10 @@ class GatewayManagerController extends BaseController
         }
     }
 
-    public function updateRequest($app, $module, $feature, $title, $action, Request $request)
+    public function managementRequest($app, $module, $feature, $title, $action, Request $request)
     {
         try {
-            $response = $this->gatewayManagerRepository->updateRequest($app, $module, $feature, $title, $action, $request);
+            $response = $this->gatewayManagerRepository->managementRequest($app, $module, $feature, $title, $action, $request);
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
             } else {

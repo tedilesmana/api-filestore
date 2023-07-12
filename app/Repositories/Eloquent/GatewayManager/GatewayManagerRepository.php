@@ -44,8 +44,8 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         }
 
         if (!is_null($feature) && !is_null($application) && !is_null($module)) {
-            if (!Schema::hasTable($application->slug)) {
-                Schema::connection('mysql')->create($application->slug, function (Blueprint $table) {
+            if (!Schema::hasTable('app-' . $application->slug)) {
+                Schema::connection('mysql')->create('app-' . $application->slug, function (Blueprint $table) {
                     $table->increments('id');
                     $table->foreignId('application_id')->constrained()
                         ->onUpdate('restrict')
@@ -55,7 +55,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
                         ->onDelete('restrict');
                     $table->foreignId('feature_id')->constrained()
                         ->onUpdate('restrict')
-                        ->onDelete('restrict'); 
+                        ->onDelete('restrict');
                     $table->string('name')->unique();
                     $table->string('slug');
                     $table->string('description');
@@ -87,21 +87,21 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             }
             $input["link_api_gateway"] = "{$base_url}/api/gateway-manager/{$application->slug}/{$module->slug}/{$feature->slug}/{$input["slug"]}" . $ids;
             unset($input["ids"]);
-            $result = DB::table($application->slug)->insert(
+            $result = DB::table('app-' . $application->slug)->insert(
                 $input
             );
             return $this->apiController->trueResult("Data request berhasil di buat", $result);
         }
     }
 
-    public function updateRequest($app, $module, $feature, $title, $action, $request)
+    public function managementRequest($app, $module, $feature, $title, $action, $request)
     {
         $applicationItem = DB::table("applications")->where("slug", $app)->first();
         $moduleItem = DB::table("modules")->where("slug", $module)->first();
         $featureItem = DB::table("features")->where("slug", $feature)->first();
 
         if ($action == "detail") {
-            $requestItem = DB::table($app)
+            $requestItem = DB::table('app-' . $app)
                 ->leftJoin('applications', function ($join)  use ($app) {
                     $join->on('applications.id', '=', $app . '.application_id');
                 })
@@ -118,7 +118,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         }
 
         if ($action == "by_application_id") {
-            $listByAppId = DB::table($app)
+            $listByAppId = DB::table('app-' . $app)
                 ->leftJoin('applications', function ($join)  use ($app) {
                     $join->on('applications.id', '=', $app . '.application_id');
                 })
@@ -135,7 +135,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         }
 
         if ($action == "by_module_id") {
-            $listByModuleId = DB::table($app)
+            $listByModuleId = DB::table('app-' . $app)
                 ->leftJoin('applications', function ($join)  use ($app) {
                     $join->on('applications.id', '=', $app . '.application_id');
                 })
@@ -152,7 +152,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         }
 
         if ($action == "by_feature_id") {
-            $listByFeatureId = DB::table($app)
+            $listByFeatureId = DB::table('app-' . $app)
                 ->leftJoin('applications', function ($join)  use ($app) {
                     $join->on('applications.id', '=', $app . '.application_id');
                 })
@@ -169,7 +169,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         }
 
         if ($action == "delete") {
-            $deleteItem = DB::table($app)->where("slug", $title)->delete();
+            $deleteItem = DB::table('app-' . $app)->where("slug", $title)->delete();
             return $this->apiController->trueResult("Delete request berhasil di lakukan", $deleteItem);
         }
 
@@ -191,7 +191,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             $input["updated_at"] = Carbon::now();
             unset($input["ids"]);
 
-            $updateItem = DB::table($app)->where("slug", $title)->update($input);
+            $updateItem = DB::table('app-' . $app)->where("slug", $title)->update($input);
             return $this->apiController->trueResult("Update request berhasil di lakukan", $updateItem);
         }
     }
@@ -199,7 +199,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
     public function proceedRequest($app, $module, $feature, $title)
     {
         $applicationItem = DB::table("applications")->where("slug", $app)->first();
-        $requestItem = DB::table($app)->where("slug", $title)->first();
+        $requestItem = DB::table('app-' . $app)->where("slug", $title)->first();
         $requestItem->token = $applicationItem->token;
         return $this->apiController->trueResult("Detail request berhasil di ambil", $requestItem);
     }
