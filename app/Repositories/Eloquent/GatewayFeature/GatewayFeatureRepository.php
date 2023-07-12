@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent\GatewayFeature;
 
 use App\Http\Controllers\BaseController;
+use App\Http\Resources\Global\GlobarResource;
 use App\Models\Feature;
 use App\Repositories\Interfaces\GatewayFeature\GatewayFeatureRepositoryInterface;
 use App\Services\MessageGatewayService;
@@ -32,7 +33,7 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
             ->paginate($request->limit ?? 10);
 
         if ($results) {
-            return $this->apiController->trueResult("Data feature berhasil di temukan", (object) ["data" => $results, "pagination" => setPagination($results)]);
+            return $this->apiController->trueResult("Data feature berhasil di temukan", (object) ["data" => GlobarResource::collection($results), "pagination" => setPagination($results)]);
         } else {
             return $this->apiController->falseResult("Data feature gagal di ambil", null);
         }
@@ -40,7 +41,7 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
 
     public function getById($id)
     {
-        return $this->apiController->trueResult("Semua data dengan id yang di maksud berhasil di ambil", Feature::where("module_id", $id)->get());
+        return $this->apiController->trueResult("Semua data dengan id yang di maksud berhasil di ambil", (object) ["data" => Feature::where("module_id", $id)->get(), "pagination" => null]);
     }
 
     public function create($request)

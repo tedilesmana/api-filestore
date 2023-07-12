@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent\GatewayApplication;
 
 use App\Http\Controllers\BaseController;
+use App\Http\Resources\Global\GlobarResource;
 use App\Models\Application;
 use App\Repositories\Interfaces\GatewayApplication\GatewayApplicationRepositoryInterface;
 use App\Services\MessageGatewayService;
@@ -33,7 +34,7 @@ class GatewayApplicationRepository implements GatewayApplicationRepositoryInterf
             ->paginate($request->limit ?? 10);
 
         if ($results) {
-            return $this->apiController->trueResult("Data applikasi berhasil di temukan", (object) ["data" => $results, "pagination" => setPagination($results)]);
+            return $this->apiController->trueResult("Data applikasi berhasil di temukan", (object) ["data" => GlobarResource::collection($results), "pagination" => setPagination($results)]);
         } else {
             return $this->apiController->falseResult("Data applikasi gagal di ambil", null);
         }

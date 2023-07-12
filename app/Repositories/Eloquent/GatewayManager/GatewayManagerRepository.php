@@ -182,7 +182,10 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
                 $ids = $ids . '/' . $listIds[$i];
             }
             $input["link_api_gateway"] = "{$base_url}/api/gateway-manager/{$applicationItem->slug}/{$moduleItem->slug}/{$featureItem->slug}/{$input["slug"]}" . $ids;
-            $input["payload"] = json_encode($request->payload);
+            $input["body"] = json_encode($request->body);
+            $input["params"] = json_encode($request->params);
+            $input["headers"] = json_encode($request->headers);
+            $input["authorization"] = json_encode($request->authorization);
             $input["updated_at"] = Carbon::now();
             unset($input["ids"]);
 

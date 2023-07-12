@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent\GatewayModule;
 
 use App\Http\Controllers\BaseController;
+use App\Http\Resources\Global\GlobarResource;
 use App\Models\Module;
 use App\Repositories\Interfaces\GatewayModule\GatewayModuleRepositoryInterface;
 use App\Services\MessageGatewayService;
@@ -33,7 +34,7 @@ class GatewayModuleRepository implements GatewayModuleRepositoryInterface
             ->paginate($request->limit ?? 10);
 
         if ($results) {
-            return $this->apiController->trueResult("Data additional menu berhasil di temukan", (object) ["data" => $results, "pagination" => setPagination($results)]);
+            return $this->apiController->trueResult("Data additional menu berhasil di temukan", (object) ["data" => GlobarResource::collection($results), "pagination" => setPagination($results)]);
         } else {
             return $this->apiController->falseResult("Data additional menu gagal di ambil", null);
         }
