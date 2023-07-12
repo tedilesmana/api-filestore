@@ -103,16 +103,16 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         if ($action == "detail") {
             $requestItem = DB::table('app-' . $app)
                 ->leftJoin('applications', function ($join)  use ($app) {
-                    $join->on('applications.id', '=', $app . '.application_id');
+                    $join->on('applications.id', '=', 'app-' . $app . '.application_id');
                 })
                 ->leftJoin('modules', function ($join)  use ($app) {
-                    $join->on('modules.id', '=', $app . '.module_id');
+                    $join->on('modules.id', '=', 'app-' . $app . '.module_id');
                 })
                 ->leftJoin('features', function ($join)  use ($app) {
-                    $join->on('features.id', '=', $app . '.feature_id');
+                    $join->on('features.id', '=', 'app-' . $app . '.feature_id');
                 })
-                ->where($app . ".slug", $title)
-                ->select($app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
+                ->where('app-' . $app . ".slug", $title)
+                ->select('app-' . $app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
                 ->first();
             return $this->apiController->trueResult("Detail request berhasil di ambil", $requestItem);
         }
@@ -120,16 +120,16 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         if ($action == "by_application_id") {
             $listByAppId = DB::table('app-' . $app)
                 ->leftJoin('applications', function ($join)  use ($app) {
-                    $join->on('applications.id', '=', $app . '.application_id');
+                    $join->on('applications.id', '=', 'app-' . $app . '.application_id');
                 })
                 ->leftJoin('modules', function ($join)  use ($app) {
-                    $join->on('modules.id', '=', $app . '.module_id');
+                    $join->on('modules.id', '=', 'app-' . $app . '.module_id');
                 })
                 ->leftJoin('features', function ($join)  use ($app) {
-                    $join->on('features.id', '=', $app . '.feature_id');
+                    $join->on('features.id', '=', 'app-' . $app . '.feature_id');
                 })
                 ->where("applications.id", $applicationItem->id)
-                ->select($app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
+                ->select('app-' . $app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
                 ->get();
             return $this->apiController->trueResult("Data request by applikasi berhasil di ambil", $listByAppId);
         }
@@ -137,16 +137,16 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         if ($action == "by_module_id") {
             $listByModuleId = DB::table('app-' . $app)
                 ->leftJoin('applications', function ($join)  use ($app) {
-                    $join->on('applications.id', '=', $app . '.application_id');
+                    $join->on('applications.id', '=', 'app-' . $app . '.application_id');
                 })
                 ->leftJoin('modules', function ($join)  use ($app) {
-                    $join->on('modules.id', '=', $app . '.module_id');
+                    $join->on('modules.id', '=', 'app-' . $app . '.module_id');
                 })
                 ->leftJoin('features', function ($join)  use ($app) {
-                    $join->on('features.id', '=', $app . '.feature_id');
+                    $join->on('features.id', '=', 'app-' . $app . '.feature_id');
                 })
                 ->where("modules.id", $moduleItem->id)
-                ->select($app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
+                ->select('app-' . $app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
                 ->get();
             return $this->apiController->trueResult("Data request by module berhasil di ambil", $listByModuleId);
         }
@@ -154,16 +154,16 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         if ($action == "by_feature_id") {
             $listByFeatureId = DB::table('app-' . $app)
                 ->leftJoin('applications', function ($join)  use ($app) {
-                    $join->on('applications.id', '=', $app . '.application_id');
+                    $join->on('applications.id', '=', 'app-' . $app . '.application_id');
                 })
                 ->leftJoin('modules', function ($join)  use ($app) {
-                    $join->on('modules.id', '=', $app . '.module_id');
+                    $join->on('modules.id', '=', 'app-' . $app . '.module_id');
                 })
                 ->leftJoin('features', function ($join)  use ($app) {
-                    $join->on('features.id', '=', $app . '.feature_id');
+                    $join->on('features.id', '=', 'app-' . $app . '.feature_id');
                 })
                 ->where("features.id", $featureItem->id)
-                ->select($app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
+                ->select('app-' . $app . '.*', 'applications.name as name_application', 'modules.name as name_module', 'features.name as name_feature')
                 ->get();
             return $this->apiController->trueResult("Detail request by feature berhasil di ambil", $listByFeatureId);
         }
