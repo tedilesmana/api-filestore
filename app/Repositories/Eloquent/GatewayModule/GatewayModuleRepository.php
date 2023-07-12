@@ -42,10 +42,10 @@ class GatewayModuleRepository implements GatewayModuleRepositoryInterface
 
     public function getById($id)
     {
-        $result = Module::where("application_id", $id)->get();
+        $results = Module::find($id);
 
-        if ($result) {
-            return $this->apiController->trueResult("Data module berhasil di ambil", (object) ["data" => $result, "pagination" => null]);
+        if ($results) {
+            return $this->apiController->trueResult("Data module berhasil di temukan", (object) ["data" => $results, "pagination" => null]);
         } else {
             return $this->apiController->falseResult("Data module gagal di ambil", null);
         }

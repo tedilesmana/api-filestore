@@ -41,7 +41,13 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
 
     public function getById($id)
     {
-        return $this->apiController->trueResult("Semua data dengan id yang di maksud berhasil di ambil", (object) ["data" => Feature::where("module_id", $id)->get(), "pagination" => null]);
+        $results = Feature::find($id);
+
+        if ($results) {
+            return $this->apiController->trueResult("Data feature berhasil di temukan", (object) ["data" => $results, "pagination" => null]);
+        } else {
+            return $this->apiController->falseResult("Data feature gagal di ambil", null);
+        }
     }
 
     public function create($request)
