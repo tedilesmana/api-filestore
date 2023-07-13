@@ -19,7 +19,7 @@ class CreateMenusTable extends Migration
                 ->onUpdate('restrict')
                 ->onDelete('restrict');
             $table->char('menu_code', 35)->unique();
-            $table->bigInteger('sort');
+            $table->bigInteger('sort')->default(0);
             $table->string('name')->nullable();
             $table->string('title')->nullable();
             $table->string('sub_title')->nullable();

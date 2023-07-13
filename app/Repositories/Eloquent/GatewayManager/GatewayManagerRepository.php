@@ -56,7 +56,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
                     $table->foreignId('feature_id')->constrained()
                         ->onUpdate('restrict')
                         ->onDelete('restrict');
-                    $table->bigInteger('sort');
+                    $table->bigInteger('sort')->default(0);
                     $table->string('name');
                     $table->string('slug');
                     $table->string('description');

@@ -18,7 +18,7 @@ class CreateFeaturesTable extends Migration
             $table->foreignId('module_id')->constrained()
                 ->onUpdate('restrict')
                 ->onDelete('restrict');
-            $table->bigInteger('sort');
+            $table->bigInteger('sort')->default(0);
             $table->string('name');
             $table->string('description'); 
             $table->string('slug');
