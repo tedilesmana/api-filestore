@@ -5,7 +5,9 @@ namespace App\Repositories\Eloquent\MasterLovGroup;
 use App\Http\Controllers\BaseController;
 use App\Http\Resources\MasterLov\MasterLovGroupResource;
 use App\Models\MasterLovGroup;
+use App\Models\MasterLovValue;
 use App\Repositories\Interfaces\MasterLovGroup\MasterLovGroupRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class MasterLovGroupRepository implements MasterLovGroupRepositoryInterface
 {
@@ -61,9 +63,11 @@ class MasterLovGroupRepository implements MasterLovGroupRepositoryInterface
 
     public function update($request, $id)
     {
+        DB::beginTransaction();
         $result = MasterLovGroup::find($id);
 
         if ($result) {
+            MasterLovValue::where('group_name', $result->group_name)->update(['group_name' => $request->group_name]);
             $result->group_name = $request->group_name;
 
             if ($result->isClean()) {
@@ -73,11 +77,14 @@ class MasterLovGroupRepository implements MasterLovGroupRepositoryInterface
             $result->save();
 
             if ($result) {
+                DB::commit();
                 return $this->apiController->trueResult("Data master lov group berhasil di update", (object) ["data" => new MasterLovGroupResource($result), "pagination" => null]);
             } else {
+                DB::rollBack();
                 return $this->apiController->falseResult("Data master lov group gagal di update", null);
             }
         } else {
+            DB::rollBack();
             return $this->apiController->falseResult("Data master lov group tidak di temukan", null);
         }
     }

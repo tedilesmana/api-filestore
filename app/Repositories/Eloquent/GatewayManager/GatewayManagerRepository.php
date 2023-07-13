@@ -56,11 +56,11 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
                     $table->foreignId('feature_id')->constrained()
                         ->onUpdate('restrict')
                         ->onDelete('restrict');
-                    $table->string('name')->unique();
+                    $table->bigInteger('sort');
+                    $table->string('name');
                     $table->string('slug');
                     $table->string('description');
                     $table->string('link_api_application');
-                    // $table->string('link_api_gateway');
                     $table->string('methode');
                     $table->longText('ids')->nullable();
                     $table->longText('body')->nullable();
@@ -71,7 +71,6 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
                 });
             }
 
-            // $base_url = env('APP_URL');
             $input = $request->all();
             $input["slug"] = Str::slug($request->name);
             $input["body"] = $request->body;
@@ -82,13 +81,6 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             $input["ids"] = $request->ids;
             $input["created_at"] = Carbon::now();
             $input["updated_at"] = Carbon::now();
-            // $listIds = $request->ids ?? [];
-            // $ids = '';
-            // for ($i = 0; $i < count($listIds); $i++) {
-            //     $ids = $ids . '/{' . $listIds[$i] . '}';
-            // }
-            // $input["link_api_gateway"] = "{$base_url}/gateway-manager-management/{$application->slug}/{$module->slug}/{$feature->slug}/{$input["slug"]}" . $ids;
-            // unset($input["ids"]);
             $result = DB::table('app-' . $application->slug)->insert(
                 $input
             );
@@ -176,15 +168,8 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
         }
 
         if ($action == "update") {
-            // $base_url = env('APP_URL');
             $input = $request->all();
             $input["slug"] = Str::slug($request->name);
-            // $listIds = $request->ids ?? [];
-            // $ids = '';
-            // for ($i = 0; $i < count($listIds); $i++) {
-            //     $ids = $ids . '/' . $listIds[$i];
-            // }
-            // $input["link_api_gateway"] = "{$base_url}/gateway-manager-management/{$applicationItem->slug}/{$moduleItem->slug}/{$featureItem->slug}/{$input["slug"]}" . $ids;
             $input["body"] = $request->body;
             $input["params"] = $request->params;
             unset($input["data_headers"]);

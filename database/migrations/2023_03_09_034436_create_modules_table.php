@@ -18,7 +18,8 @@ class CreateModulesTable extends Migration
             $table->foreignId('application_id')->constrained()
                 ->onUpdate('restrict')
                 ->onDelete('restrict');
-            $table->string('name')->unique();
+            $table->bigInteger('sort');
+            $table->string('name');
             $table->string('description');
             $table->string('slug');
             $table->timestamps();
