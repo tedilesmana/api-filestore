@@ -57,7 +57,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
                         ->onUpdate('restrict')
                         ->onDelete('restrict');
                     $table->bigInteger('sort')->default(0);
-                    $table->string('name');
+                    $table->string('name')->unique();
                     $table->string('slug');
                     $table->string('description');
                     $table->string('link_api_application');
