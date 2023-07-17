@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent\GatewayModule;
 
 use App\Http\Controllers\BaseController;
 use App\Http\Resources\Global\GlobarResource;
+use App\Models\Application;
 use App\Models\Module;
 use App\Repositories\Interfaces\GatewayModule\GatewayModuleRepositoryInterface;
 use App\Services\MessageGatewayService;
@@ -53,7 +54,9 @@ class GatewayModuleRepository implements GatewayModuleRepositoryInterface
 
     public function create($request)
     {
+        $application = Application::find($request->application_id);
         $input = $request->all();
+        $input["slug"] = Str::slug(strlen($application->id) == 1 ? '0' . $application->id : $application->id) . '-' . Str::slug($request->name);
         $result = Module::create($input);
 
         if ($result) {
@@ -65,22 +68,23 @@ class GatewayModuleRepository implements GatewayModuleRepositoryInterface
 
     public function update($request, $id)
     {
-        $application = Module::find($id);
+        $application = Application::find($request->application_id);
+        $module = Module::find($id);
 
-        if ($application) {
-            $application->name = $request->name;
-            $application->description = $request->description;
-            $application->application_id = $request->application_id;
-            $application->slug = Str::slug($request->name);
+        if ($module) {
+            $module->name = $request->name;
+            $module->description = $request->description;
+            $module->application_id = $request->application_id;
+            $module->slug = Str::slug(strlen($application->id) == 1 ? '0' . $application->id : $application->id) . '-' . Str::slug($request->name);
 
-            if ($application->isClean()) {
+            if ($module->isClean()) {
                 return $this->apiController->falseResult('Tidak ada perubahan data yang anda masukan', null);
             }
 
-            $application->save();
+            $module->save();
 
-            if ($application) {
-                return $this->apiController->trueResult("Data module berhasil di update", (object) ["data" => $application, "pagination" => null]);
+            if ($module) {
+                return $this->apiController->trueResult("Data module berhasil di update", (object) ["data" => $module, "pagination" => null]);
             } else {
                 return $this->apiController->falseResult("Data module gagal di update", null);
             }

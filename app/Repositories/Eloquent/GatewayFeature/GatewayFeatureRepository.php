@@ -4,7 +4,9 @@ namespace App\Repositories\Eloquent\GatewayFeature;
 
 use App\Http\Controllers\BaseController;
 use App\Http\Resources\Global\GlobarResource;
+use App\Models\Application;
 use App\Models\Feature;
+use App\Models\Module;
 use App\Repositories\Interfaces\GatewayFeature\GatewayFeatureRepositoryInterface;
 use App\Services\MessageGatewayService;
 use Illuminate\Support\Str;
@@ -52,7 +54,10 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
 
     public function create($request)
     {
+        $module = Module::find($request->module_id);
+        $application = Application::find($module->application_id);
         $input = $request->all();
+        $input["slug"] = Str::slug(strlen($application->id) == 1 ? '0' . $application->id : $application->id) . '-' . Str::slug($request->name);
         $result = Feature::create($input);
 
         if ($result) {
@@ -64,22 +69,24 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
 
     public function update($request, $id)
     {
-        $application = Feature::find($id);
+        $module = Module::find($request->module_id);
+        $application = Application::find($module->application_id);
+        $feature = Feature::find($id);
 
-        if ($application) {
-            $application->name = $request->name;
-            $application->description = $request->description;
-            $application->module_id = $request->module_id;
-            $application->slug = Str::slug($request->name);
+        if ($feature) {
+            $feature->name = $request->name;
+            $feature->description = $request->description;
+            $feature->module_id = $request->module_id;
+            $feature->slug = Str::slug(strlen($application->id) == 1 ? '0' . $application->id : $application->id) . '-' . Str::slug($request->name);
 
-            if ($application->isClean()) {
+            if ($feature->isClean()) {
                 return $this->apiController->falseResult('Tidak ada perubahan data yang anda masukan', null);
             }
 
-            $application->save();
+            $feature->save();
 
-            if ($application) {
-                return $this->apiController->trueResult("Data feature berhasil di update", (object) ["data" => $application, "pagination" => null]);
+            if ($feature) {
+                return $this->apiController->trueResult("Data feature berhasil di update", (object) ["data" => $feature, "pagination" => null]);
             } else {
                 return $this->apiController->falseResult("Data feature gagal di update", null);
             }
@@ -90,13 +97,13 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
 
     public function delete($id)
     {
-        $application = Feature::find($id);
+        $feature = Feature::find($id);
 
-        if ($application) {
-            $application->delete();
+        if ($feature) {
+            $feature->delete();
 
-            if ($application) {
-                return $this->apiController->trueResult("Data feature berhasil di hapus", (object) ["data" => $application, "pagination" => null]);
+            if ($feature) {
+                return $this->apiController->trueResult("Data feature berhasil di hapus", (object) ["data" => $feature, "pagination" => null]);
             } else {
                 return $this->apiController->falseResult("Data feature gagal di hapus", null);
             }

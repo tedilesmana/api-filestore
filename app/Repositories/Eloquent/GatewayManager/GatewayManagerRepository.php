@@ -57,8 +57,8 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
                         ->onUpdate('restrict')
                         ->onDelete('restrict');
                     $table->bigInteger('sort')->default(0);
-                    $table->string('name')->unique();
-                    $table->string('slug');
+                    $table->string('name');
+                    $table->string('slug')->unique();
                     $table->string('description');
                     $table->string('link_api_application');
                     $table->string('methode');
@@ -72,7 +72,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             }
 
             $input = $request->all();
-            $input["slug"] = Str::slug($request->name);
+            $input["slug"] = strlen($application->id) == 1 ? '0' . $application->id . '-' . Str::slug($request->name) : $application->id . '-' . Str::slug($request->name);
             $input["body"] = $request->body;
             $input["params"] = $request->params;
             unset($input["data_headers"]);
@@ -81,6 +81,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             $input["ids"] = $request->ids;
             $input["created_at"] = Carbon::now();
             $input["updated_at"] = Carbon::now();
+            dd($input);
             $result = DB::table('app-' . $application->slug)->insert(
                 $input
             );
@@ -169,7 +170,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
 
         if ($action == "update") {
             $input = $request->all();
-            $input["slug"] = Str::slug($request->name);
+            $input["slug"] = strlen($applicationItem->id) == 1 ? '0' . $applicationItem->id . '-' . Str::slug($request->name) : $applicationItem->id . '-' . Str::slug($request->name);
             $input["body"] = $request->body;
             $input["params"] = $request->params;
             unset($input["data_headers"]);

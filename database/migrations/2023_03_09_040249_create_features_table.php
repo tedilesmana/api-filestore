@@ -19,9 +19,9 @@ class CreateFeaturesTable extends Migration
                 ->onUpdate('restrict')
                 ->onDelete('restrict');
             $table->bigInteger('sort')->default(0);
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('description'); 
-            $table->string('slug');
+            $table->string('slug')->unique();
             $table->timestamps();
             $table->softDeletes();
         });
