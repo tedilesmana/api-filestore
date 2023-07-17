@@ -81,7 +81,6 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             $input["ids"] = $request->ids;
             $input["created_at"] = Carbon::now();
             $input["updated_at"] = Carbon::now();
-            dd($input);
             $result = DB::table('app-' . $application->slug)->insert(
                 $input
             );
