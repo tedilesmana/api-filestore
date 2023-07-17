@@ -136,10 +136,14 @@ class GatewayManagerController extends BaseController
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
             if ($result->data->methode == "GET") {
                 $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request);
-                if ($response->success) {
-                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                if (str_contains($title, 'export')) {
+                    return $response;
                 } else {
-                    return $this->errorResponse($response->message, $response->data);
+                    if ($response->success) {
+                        return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                    } else {
+                        return $this->errorResponse($response->message, $response->data);
+                    }
                 }
             } else {
                 return $this->errorResponse("Methode not allow", null);
