@@ -40,6 +40,7 @@ Route::post('auth/login-by-whatsapp', [AuthController::class, 'loginWithWhatsApp
 Route::post('auth/login-by-google', [AuthController::class, 'login']);
 Route::post('auth/login-by-whatsapp/validate', [AuthController::class, 'generateTokenWhatsApp']);
 Route::get('unauthorize', [AuthController::class, 'unauthorize']);
+Route::get('gateway-manager-passed/{app}/{module}/{feature}/{title}', [GatewayManagerController::class, 'getRequest']);
 
 Route::get('/', function () {
     return view('welcome');
