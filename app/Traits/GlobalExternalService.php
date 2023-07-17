@@ -3,9 +3,7 @@
 namespace App\Traits;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
-use Psr\Http\Message\ResponseInterface;
 
 trait GlobalExternalService
 {
@@ -24,6 +22,10 @@ trait GlobalExternalService
 
         $request = new Request($method, $requestUrl . $params, $headers);
         $response = $client->sendAsync($request,  $body)->wait();
-        return json_decode($response->getBody()->getContents());
+        if (str_contains($requestUrl, 'export')) {
+            return $response;
+        } else {
+            return json_decode($response->getBody()->getContents());
+        }
     }
 }
