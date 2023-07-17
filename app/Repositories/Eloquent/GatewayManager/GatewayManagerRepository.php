@@ -72,7 +72,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
             }
 
             $input = $request->all();
-            $input["slug"] = strlen($application->id) == 1 ? '0' . $application->id . '-' . Str::slug($request->name) : $application->id . '-' . Str::slug($request->name);
+            $input["slug"] = (strlen($application->id) == 1 ? '0' . $application->id : $application->id) . (strlen($module->id) == 1 ? '0' . $module->id : $module->id) . '-' . Str::slug($request->name);
             $input["body"] = $request->body;
             $input["params"] = $request->params;
             unset($input["data_headers"]);
@@ -169,7 +169,7 @@ class GatewayManagerRepository implements GatewayManagerRepositoryInterface
 
         if ($action == "update") {
             $input = $request->all();
-            $input["slug"] = strlen($applicationItem->id) == 1 ? '0' . $applicationItem->id . '-' . Str::slug($request->name) : $applicationItem->id . '-' . Str::slug($request->name);
+            $input["slug"] = (strlen($applicationItem->id) == 1 ? '0' . $applicationItem->id : $applicationItem->id) . (strlen($moduleItem->id) == 1 ? '0' . $moduleItem->id : $moduleItem->id) . '-' . Str::slug($request->name);
             $input["body"] = $request->body;
             $input["params"] = $request->params;
             unset($input["data_headers"]);

@@ -57,7 +57,7 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
         $module = Module::find($request->module_id);
         $application = Application::find($module->application_id);
         $input = $request->all();
-        $input["slug"] = Str::slug(strlen($application->id) == 1 ? '0' . $application->id : $application->id) . '-' . Str::slug($request->name);
+        $input["slug"] = Str::slug(strlen($application->id) == 1 ? '0' . $application->id : $application->id) . Str::slug(strlen($module->id) == 1 ? '0' . $module->id : $module->id) . '-' . Str::slug($request->name);
         $result = Feature::create($input);
 
         if ($result) {
@@ -77,7 +77,7 @@ class GatewayFeatureRepository implements GatewayFeatureRepositoryInterface
             $feature->name = $request->name;
             $feature->description = $request->description;
             $feature->module_id = $request->module_id;
-            $feature->slug = Str::slug(strlen($application->id) == 1 ? '0' . $application->id : $application->id) . '-' . Str::slug($request->name);
+            $feature->slug = Str::slug(strlen($application->id) == 1 ? '0' . $application->id : $application->id) . Str::slug(strlen($module->id) == 1 ? '0' . $module->id : $module->id) . '-' . Str::slug($request->name);
 
             if ($feature->isClean()) {
                 return $this->apiController->falseResult('Tidak ada perubahan data yang anda masukan', null);
