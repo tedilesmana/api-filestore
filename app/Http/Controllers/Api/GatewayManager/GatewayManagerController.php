@@ -96,7 +96,26 @@ class GatewayManagerController extends BaseController
     {
         try {
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
-            if ($result->data->methode == "post") {
+            if ($result->data->methode == "POST") {
+                $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request);
+                if ($response->success) {
+                    return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
+                } else {
+                    return $this->errorResponse($response->message, $response->data);
+                }
+            } else {
+                return $this->errorResponse("Methode not allow", null);
+            }
+        } catch (\Exception $e) {
+            return $this->badResponse($e->getMessage(), null);
+        }
+    }
+
+    public function putRequest($app, $module, $feature, $title, Request $request)
+    {
+        try {
+            $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
+            if ($result->data->methode == "PUT") {
                 $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request);
                 if ($response->success) {
                     return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
@@ -115,7 +134,7 @@ class GatewayManagerController extends BaseController
     {
         try {
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
-            if ($result->data->methode == "get") {
+            if ($result->data->methode == "GET") {
                 $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request);
                 if ($response->success) {
                     return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
@@ -134,7 +153,7 @@ class GatewayManagerController extends BaseController
     {
         try {
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
-            if ($result->data->methode == "post") {
+            if ($result->data->methode == "POST") {
                 $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id);
                 if ($response->success) {
                     return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
@@ -153,7 +172,7 @@ class GatewayManagerController extends BaseController
     {
         try {
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
-            if ($result->data->methode == "put") {
+            if ($result->data->methode == "PUT") {
                 $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id);
                 if ($response->success) {
                     return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
@@ -172,7 +191,7 @@ class GatewayManagerController extends BaseController
     {
         try {
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
-            if ($result->data->methode == "delete") {
+            if ($result->data->methode == "DELETE") {
                 $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id);
                 if ($response->success) {
                     return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
@@ -191,7 +210,7 @@ class GatewayManagerController extends BaseController
     {
         try {
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
-            if ($result->data->methode == "get") {
+            if ($result->data->methode == "GET") {
                 $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id);
                 if ($response->success) {
                     return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
@@ -210,7 +229,7 @@ class GatewayManagerController extends BaseController
     {
         try {
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
-            if ($result->data->methode == "post") {
+            if ($result->data->methode == "POST") {
                 $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id, "/" . $idTwo);
                 if ($response->success) {
                     return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
@@ -229,7 +248,7 @@ class GatewayManagerController extends BaseController
     {
         try {
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
-            if ($result->data->methode == "put") {
+            if ($result->data->methode == "PUT") {
                 $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id, "/" . $idTwo);
                 if ($response->success) {
                     return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
@@ -248,7 +267,7 @@ class GatewayManagerController extends BaseController
     {
         try {
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
-            if ($result->data->methode == "delete") {
+            if ($result->data->methode == "DELETE") {
                 $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id, "/" . $idTwo);
                 if ($response->success) {
                     return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);
@@ -267,7 +286,7 @@ class GatewayManagerController extends BaseController
     {
         try {
             $result = $this->gatewayManagerRepository->proceedRequest($app, $module, $feature, $title);
-            if ($result->data->methode == "get") {
+            if ($result->data->methode == "GET") {
                 $response = (object) $this->globalGatewayService->globalApiGatewayService($result->data, $request, "/" . $id, "/" . $idTwo);
                 if ($response->success) {
                     return $this->successResponse($response->message, $response->data, isset($response->pagination) ? $response->pagination : null);

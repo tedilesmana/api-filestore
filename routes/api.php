@@ -57,6 +57,7 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('gateway-module', ModuleController::class);
     Route::resource('gateway-feature', FeatureController::class);
     Route::post('gateway-manager/{app}/{module}/{feature}/{title}', [GatewayManagerController::class, 'postRequest']);
+    Route::put('gateway-manager/{app}/{module}/{feature}/{title}', [GatewayManagerController::class, 'putRequest']);
     Route::get('gateway-manager/{app}/{module}/{feature}/{title}', [GatewayManagerController::class, 'getRequest']);
     Route::post('gateway-manager/{app}/{module}/{feature}/{title}/{id}', [GatewayManagerController::class, 'postRequestOneId']);
     Route::put('gateway-manager/{app}/{module}/{feature}/{title}/{id}', [GatewayManagerController::class, 'putRequestOneId']);
