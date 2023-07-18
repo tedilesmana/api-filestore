@@ -26,16 +26,16 @@ class UserResource extends JsonResource
 
         $role = [];
 
-        if (str_contains($this->email, 'lecturer.paramadina.ac.id')) {
-            $result = RoleUser::updateOrCreate([
-                'user_id' => $this->id,
-                'role_id' => 2
-            ], [
-                'user_id' => $this->id,
-                'role_id' => 2
-            ]);
-            $role = [...$role, $result];
-        }
+        // if (str_contains($this->email, 'lecturer.paramadina.ac.id')) {
+        //     $result = RoleUser::updateOrCreate([
+        //         'user_id' => $this->id,
+        //         'role_id' => 2
+        //     ], [
+        //         'user_id' => $this->id,
+        //         'role_id' => 2
+        //     ]);
+        //     $role = [...$role, $result];
+        // }
 
         if ($this->student) {
             $result = RoleUser::updateOrCreate([
