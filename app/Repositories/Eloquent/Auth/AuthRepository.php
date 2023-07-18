@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Http\Controllers\BaseController;
 use App\Http\Resources\Jabatan\MasterJabatanResource;
 use App\Http\Resources\Jabatan\RoleResource;
+use App\Http\Resources\User\RoleUserResource;
 use App\Http\Resources\User\UserResource;
 use App\Models\Employee;
 use App\Models\MasterJabatan;
@@ -62,7 +63,7 @@ class AuthRepository implements AuthRepositoryInterface
             ->paginate($request->limit ?? 10);
 
         if ($results) {
-            return $this->apiController->trueResult("Data user berhasil di temukan", (object) ["data" => UserResource::collection($results), "pagination" => setPagination($results)]);
+            return $this->apiController->trueResult("Data user berhasil di temukan", (object) ["data" => RoleUserResource::collection($results), "pagination" => setPagination($results)]);
         } else {
             return $this->apiController->falseResult("Data user gagal di ambil", null);
         }

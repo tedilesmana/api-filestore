@@ -8,7 +8,7 @@ use App\Models\RoleUser;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends JsonResource
+class RoleUserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -75,12 +75,8 @@ class UserResource extends JsonResource
             }
         }
 
-        $isHaveActiveEmployee = $haveEmployee && $isActiveEmployee;
-        $isHaveActiveStudent = $haveStudent && $isActiveStudent;
-        $isHaveActiveDlb = $haveDlbEmployee && $isActiveDlbEmployee;
-
         $roleJabatan = $haveEmployee && $isActiveEmployee ? JabatanStrukturalResource::collection($this->employee->trackJabatan) : [];
-        $specialRole = $isHaveActiveStudent || $isHaveActiveEmployee || $isHaveActiveDlb ? RoleResource::collection($this->roles) : [];
+        $specialRole = RoleResource::collection($this->roles);
 
         return [
             'id' => $this->id,
