@@ -37,16 +37,16 @@ class UserResource extends JsonResource
         //     $role = [...$role, $result];
         // }
 
-        if ($this->student) {
-            $result = RoleUser::updateOrCreate([
-                'user_id' => $this->id,
-                'role_id' => 1
-            ], [
-                'user_id' => $this->id,
-                'role_id' => 1
-            ]);
-            $role = [...$role, $result];
-        }
+        // if ($this->student) {
+        //     $result = RoleUser::updateOrCreate([
+        //         'user_id' => $this->id,
+        //         'role_id' => 1
+        //     ], [
+        //         'user_id' => $this->id,
+        //         'role_id' => 1
+        //     ]);
+        //     $role = [...$role, $result];
+        // }
 
         $isActiveEmployee = false;
         $isActiveDlbEmployee = false;
