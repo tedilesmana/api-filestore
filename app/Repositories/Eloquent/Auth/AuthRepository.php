@@ -57,6 +57,16 @@ class AuthRepository implements AuthRepositoryInterface
         $queryFilter = setQueryList($request, $columns);
 
         $results = User::select('*')
+            // ->whereHas('employee', function ($query) {
+            //     return $query->where('is_active', '=', 1);
+            // })
+            // ->whereHas('dlbEmployee', function ($query) {
+            //     return $query->where('is_active', '=', 1);
+            // })
+            // ->whereHas('student', function ($query) {
+            //     // Carbon::now()->startOfDay()->gte($this->student->tanggal_lulus)
+            //     return $query->where('is_active', '=', 1);
+            // })
             ->whereRaw($queryFilter["queryKey"], $queryFilter["queryVal"])
             ->WhereRaw($queryFilter["querySearchKey"], $queryFilter["querySearchVal"])
             ->orderBy($request->orderKey ?? "id", $request->orderBy ?? "asc")
