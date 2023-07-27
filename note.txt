@@ -10,6 +10,7 @@ composer dump-autoload &&
 composer update &&
 php artisan migrate
 
+php artisan make:mail SubmitPresensi
 php artisan make:migration alter_table_users_change_pin_number --table=users
 php artisan make:migration add_column_menu_to_routes_table --table=routes
 php artisan make:migration drop_column_image_url_in_categories_table --table=categories

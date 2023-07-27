@@ -43,6 +43,7 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth:api')->group(function () {
+    Route::post('email-submit-presensi', [EmailController::class, 'emailSubmitPresensi']);
     Route::get('auth/list-jabatan', [AuthController::class, 'listJabatan']);
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::resource('auth', AuthController::class);

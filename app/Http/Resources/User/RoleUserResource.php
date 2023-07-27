@@ -77,18 +77,19 @@ class RoleUserResource extends JsonResource
 
         $roleJabatan = $haveEmployee && $isActiveEmployee ? JabatanStrukturalResource::collection($this->employee->trackJabatan) : [];
         $specialRole = RoleResource::collection($this->roles);
-
-        return [
-            'id' => $this->id,
-            'email' => $this->email,
-            'name' => $this->name,
-            'phone_number' => $this->phone_number,
-            'nik_ktp' => is_null($this->userDetail) ? null : $this->userDetail->nik_ktp,
-            'employee' => $isActiveEmployee ? new EmployeeResource($this->employee) : null,
-            'dlb_employee' => $isActiveDlbEmployee ? new DlbEmployeeResource($this->dlbEmployee) : null,
-            'student' => $isActiveStudent ? new StudentResource($this->student) : null,
-            'jabatan' => [...$specialRole, ...$roleJabatan],
-            'id_mahasiswa' => $id_mahasiswa,
-        ];
+        if ($isActiveEmployee || $isActiveDlbEmployee || $isActiveStudent) {
+            return [
+                'id' => $this->id,
+                'email' => $this->email,
+                'name' => $this->name,
+                'phone_number' => $this->phone_number,
+                'nik_ktp' => is_null($this->userDetail) ? null : $this->userDetail->nik_ktp,
+                'employee' => $isActiveEmployee ? new EmployeeResource($this->employee) : null,
+                'dlb_employee' => $isActiveDlbEmployee ? new DlbEmployeeResource($this->dlbEmployee) : null,
+                'student' => $isActiveStudent ? new StudentResource($this->student) : null,
+                'jabatan' => [...$specialRole, ...$roleJabatan],
+                'id_mahasiswa' => $id_mahasiswa,
+            ];
+        }
     }
 }
