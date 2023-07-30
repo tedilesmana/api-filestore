@@ -13,6 +13,31 @@ use Spatie\ImageOptimizer\Optimizers\Pngquant;
 use Spatie\ImageOptimizer\Optimizers\Svgo;
 use WebPConvert\WebPConvert;
 
+function deleteFileInS3($imagesString)
+{
+    try {
+        $arrImage = json_decode($imagesString);
+        $result = [];
+        foreach ($arrImage as $key => $value) {
+            $fullPath = $value->image_url;
+            $lengthBaseUrlS3 = strlen('https://sip-data-storage.s3.ap-southeast-1.amazonaws.com/');
+            $cutPath = substr($fullPath, $lengthBaseUrlS3);
+            $path = str_replace('%23', '#', $cutPath);
+            $response = Storage::disk('s3')->delete($path);
+            $itemResult = [
+                "image_url" => $fullPath,
+                "status" => $response
+            ];
+
+            $result = [...$result, $itemResult];
+        }
+
+        return true;
+    } catch (\Throwable $th) {
+        return false;
+    }
+}
+
 function generalDateFormat($date)
 {
     return Carbon::parse($date)->format('d M Y');
@@ -40,6 +65,114 @@ function decodePhoneNumber($phone)
     $phone_number = explode('#', $phone);
 
     return $phone_number[0];
+}
+
+function setQueryList($request, $columns, $id = 'id')
+{
+    //filter
+    $key_filter = '';
+    $list_column = [];
+    $value_filter = [];
+    if ($request->filter) {
+        $list_filter = explode("|", $request->filter);
+
+        for ($i = 0; $i < count($list_filter); $i++) {
+            $item_keyword = explode("=", $list_filter[$i]);
+            $key_keyword = $item_keyword[0];
+            $list_column = [...$list_column, $key_keyword];
+            $value_keyword = $item_keyword[1];
+            $keyword = '%' . $value_keyword . '%';
+            if ($i == 0) {
+                $key_filter = $key_filter . "`$key_keyword` like ?";
+                $value_filter = [...$value_filter, $keyword];
+            } else {
+                $key_filter = $key_filter . " and `$key_keyword` like ?";
+                $value_filter = [...$value_filter, $keyword];
+            }
+        };
+    }
+
+    $fromDate = $request->query('from');
+    $toDate = $request->query('to');
+
+    $isSearchDateRange = !empty($fromDate) &&
+        !is_null($fromDate) && $fromDate && !empty($toDate) &&
+        !is_null($toDate) && $toDate;
+
+    $fromDateTime = $fromDate . " 00:00:00";
+    $toDateTime = $toDate . " 23:59:59";
+
+    $list_key = "";
+
+    if ($request->filter && $request->search) {
+        $list_key = $isSearchDateRange ? " (" . $key_filter . " and " . "date_created >= ?" . " and " . "date_created <= ?" . " ) " : " (" . $key_filter . " ) ";
+    }
+
+    if ($request->filter && !$request->search) {
+        $list_key = $isSearchDateRange ? " (" . $key_filter . " and " . "date_created >= ?" . " and " . "date_created <= ?" . " ) " : " (" . $key_filter . " ) ";
+    }
+
+    if (!$request->filter && $request->search) {
+        $list_key = $isSearchDateRange ? " (" . "date_created >= ?" . " and " . "date_created <= ?" . " ) " : "";
+    }
+
+    if (!$request->filter && !$request->search) {
+        $list_key = $isSearchDateRange ? " (" . " date_created >= ?" . " and " . "date_created <= ?" . " ) " : "";
+    }
+
+    $list_val = $isSearchDateRange ? [...$value_filter, $fromDateTime, $toDateTime] : [...$value_filter];
+
+    $queryKey = strlen($list_key) > 0 ? $list_key : " (`$id` like ? ) ";
+    $queryVal = count($list_val) > 0 ? $list_val : ["%%"];
+
+    //searching
+    $key_searching = '';
+    $value_searching = [];
+
+    if ($request->search) {
+        $keyword = '%' . $request->search . '%';
+        for ($i = 0; $i < count($columns); $i++) {
+            $column = $columns[$i];
+            if ($i == 0) {
+                $key_searching = $key_searching . "`$column` like ?";
+                $value_searching = [...$value_searching, $keyword];
+            } else {
+                $key_searching = $key_searching . " or `$column` like ?";
+                $value_searching = [...$value_searching, $keyword];
+            }
+        }
+    }
+
+    $querySearchKey = strlen($key_searching) > 0 ? " (" . $key_searching  . " ) " : " (`$id` like ? ) ";
+    $querySearchVal = count($value_searching) > 0 ? $value_searching : ["%%"];
+
+    return [
+        "queryKey" => $queryKey,
+        "queryVal" => $queryVal,
+        "querySearchKey" => $querySearchKey,
+        "querySearchVal" => $querySearchVal,
+        "listColumn" => $list_column
+    ];
+}
+
+function setPagination($data)
+{
+    $pagination = (object) [
+        "current_page" => $data->toArray()["current_page"],
+        "first_page_url" => $data->toArray()["first_page_url"],
+        "from" => $data->toArray()["from"],
+        "last_page" => $data->toArray()["last_page"],
+        "last_page_url" => $data->toArray()["last_page_url"],
+        "links" => $data->toArray()["links"],
+        "next_page_url" => $data->toArray()["next_page_url"],
+        "path" => $data->toArray()["path"],
+        "per_page" => $data->toArray()["per_page"],
+        "prev_page_url" => $data->toArray()["prev_page_url"],
+        "to" => $data->toArray()["to"],
+        "total" => $data->toArray()["total"]
+    ];
+
+    return $pagination;
 }
 
 function uploadImage($fileImage, $image, $directory, $type, $filename)
@@ -145,6 +278,8 @@ function deleteImage($image_url)
 
 function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 {
+    $reducePath = env('REDUCE_PATH');
+
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
             '-m85',
@@ -179,7 +314,7 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
     $imageDetails = array();
 
     foreach ($images as $image) {
-        $imageNameWithExtention = substr($image, 33);
+        $imageNameWithExtention = substr($image, 33 + $reducePath);
         $output = '';
         $type = '';
 
@@ -201,26 +336,33 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
             convertToWebp($image, $output);
         }
 
+        $size = Storage::size(substr($image, 21 + $reducePath));
+        $ext = File::extension(substr($image, 21 + $reducePath));
         $dataImage = [
-            "size" => Storage::size(substr($image, 21)),
-            "extention" => File::extension(substr($image, 21)),
+            "size" => $size,
+            "extention" => $ext,
             "type" => $type,
-            "image_url" => substr($image, 33),
+            "image_url" => $imageNameWithExtention,
+            "name" => $fileName
         ];
 
+        $sizeWebp = Storage::size(substr($output, 21 + $reducePath));
+        $extWebp = File::extension(substr($output, 21 + $reducePath));
+        $imageNameWithExtentionWebp = substr($output, 33 + $reducePath);
         $dataWebp = [
-            "size" => Storage::size(substr($output, 21)),
-            "extention" => File::extension(substr($output, 21)),
+            "size" => $sizeWebp,
+            "extention" => $extWebp,
             "type" => $type,
-            "image_url" => substr($output, 33),
+            "image_url" => $imageNameWithExtentionWebp,
+            "name" => $fileName
         ];
 
-        $dataImage = [
+        $dataImages = [
             "webp" => $dataWebp,
             "image" => $dataImage
         ];
 
-        $imageDetails = [$dataImage, ...$imageDetails];
+        $imageDetails = [$dataImages, ...$imageDetails];
     }
 
     return $imageDetails;
@@ -228,6 +370,7 @@ function resizeImageAll($directory, $imageNameWithExtension, $fileName)
 
 function resizeImageOriginal($directory, $imageNameWithExtension, $fileName)
 {
+    $reducePath = env('REDUCE_PATH');
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
             '-m85',
@@ -262,7 +405,7 @@ function resizeImageOriginal($directory, $imageNameWithExtension, $fileName)
     $imageDetails = array();
 
     foreach ($images as $image) {
-        $imageNameWithExtention = substr($image, 33);
+        $imageNameWithExtention = substr($image, 33 + $reducePath);
         $type = '';
 
         if (str_contains($imageNameWithExtention, 'lg')) {
@@ -276,10 +419,10 @@ function resizeImageOriginal($directory, $imageNameWithExtension, $fileName)
         }
 
         $dataImage = [
-            "size" => Storage::size(substr($image, 21)),
-            "extention" => File::extension(substr($image, 21)),
+            "size" => Storage::size(substr($image, 21 + $reducePath)),
+            "extention" => File::extension(substr($image, 21 + $reducePath)),
             "type" => $type,
-            "image_url" => substr($image, 33),
+            "image_url" => substr($image, 33 + $reducePath),
         ];
 
         $dataImage = [
@@ -294,6 +437,7 @@ function resizeImageOriginal($directory, $imageNameWithExtension, $fileName)
 
 function resizeImageToWebp($directory, $imageNameWithExtension, $fileName)
 {
+    $reducePath = env('REDUCE_PATH');
     $optimizerChain = (new OptimizerChain)
         ->addOptimizer(new Jpegoptim([
             '-m85',
@@ -328,7 +472,7 @@ function resizeImageToWebp($directory, $imageNameWithExtension, $fileName)
     $imageDetails = array();
 
     foreach ($images as $image) {
-        $imageNameWithExtention = substr($image, 33);
+        $imageNameWithExtention = substr($image, 33 + $reducePath);
         $output = '';
         $type = '';
 
@@ -351,17 +495,17 @@ function resizeImageToWebp($directory, $imageNameWithExtension, $fileName)
         }
 
         $dataImage = [
-            "size" => Storage::size(substr($image, 21)),
-            "extention" => File::extension(substr($image, 21)),
+            "size" => Storage::size(substr($image, 21 + $reducePath)),
+            "extention" => File::extension(substr($image, 21 + $reducePath)),
             "type" => $type,
-            "image_url" => substr($image, 33),
+            "image_url" => substr($image, 33 + $reducePath),
         ];
 
         $dataWebp = [
-            "size" => Storage::size(substr($output, 21)),
-            "extention" => File::extension(substr($output, 21)),
+            "size" => Storage::size(substr($output, 21 + $reducePath)),
+            "extention" => File::extension(substr($output, 21 + $reducePath)),
             "type" => $type,
-            "image_url" => substr($output, 33),
+            "image_url" => substr($output, 33 + $reducePath),
         ];
 
         $dataImage = [

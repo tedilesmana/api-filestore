@@ -1,4 +1,5 @@
 plokijuh890-ZXC
+brew link --overwrite --force php@8.1
 
 php artisan cache:clear &&
 php artisan view:clear &&
@@ -9,11 +10,17 @@ composer dump-autoload &&
 composer update &&
 php artisan migrate
 
+php artisan make:mail SubmitPresensi
 php artisan make:migration alter_table_users_change_pin_number --table=users
-php artisan make:migration add_column_location_to_category_images_table --table=category_images
+php artisan make:migration add_column_menu_to_routes_table --table=routes
 php artisan make:migration drop_column_image_url_in_categories_table --table=categories
 php artisan make:migration rename_table_promotions_to_owner_promotions --table=promotions
-php artisan make:migration create_looses_table --create=looses
+php artisan make:migration create_roles_table --create=roles
+php artisan make:migration create_permissions_table --create=permissions
+php artisan make:migration create_comments_table --create=comments
+
+php artisan make:controller Api/Role/RoleController -r
+php artisan make:controller Api/Permission/PermissionController -r
 
 
 update server
@@ -23,3 +30,6 @@ hrd_personal_track_jbtn_struktural
 
 
 https://stackoverflow.com/questions/40606818/laravel-passport-custom-password-column
+
+php artisan make:command SeederDlbEmployeeCron --command=seederDlbEmployee:cron
+php artisan schedule:work

@@ -14,7 +14,7 @@ services:
         links:
             - php
         networks:
-            - api-gateway
+            - api-filestore
 
     php:
         build:
@@ -31,15 +31,15 @@ services:
             - "DB_PORT=3306"
             - "DB_HOST=mariadb"
         networks:
-            - api-gateway
+            - api-filestore
 
     mariadb:
         image: mariadb
         tty: true
         restart: always
-        container_name: api-gateway.mariadb
+        container_name: api-filestore.mariadb
         networks:
-            - api-gateway
+            - api-filestore
         ports:
             - '3306:3306'
         volumes:
@@ -48,17 +48,17 @@ services:
         environment:
             - MYSQL_PASSWORD=root
             - MYSQL_ROOT_PASSWORD=root
-            - MYSQL_DATABASE=api-gateway-staging
+            - MYSQL_DATABASE=filestore
 
     redis:
         image: bitnami/redis:latest
         restart: always
         tty: true
-        container_name: api-gateway.redis
+        container_name: api-filestore.redis
         volumes:
             - dbredis_ga:/bitnami/redis/data
         networks:
-            - api-gateway
+            - api-filestore
         environment:
             - ALLOW_EMPTY_PASSWORD=no
             - REDIS_PASSWORD=root
@@ -79,7 +79,7 @@ services:
         links:
             - "mariadb:mariadb"
         networks:
-            - api-gateway
+            - api-filestore
 
 volumes:
     dbmysql_ga:
@@ -87,5 +87,5 @@ volumes:
     nginx-conf_ga:
 
 networks:
-    api-gateway:
+    api-filestore:
         driver: bridge

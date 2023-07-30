@@ -24,10 +24,6 @@ class GlobalApiGatewayService
             ]];
         }
 
-        // $body = [
-        //     'multipart' => $multipart
-        // ];
-
         return $this->performeRequest($result->methode, $result->link_api_application . $id . $idTwo, $result->token, [], [], $params);
     }
 }

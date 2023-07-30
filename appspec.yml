@@ -13,7 +13,7 @@ hooks:
       timeout: 300
       runas: root
     - location: scripts/change_permissions.sh
-      timeout: 501
+      timeout: 480
       runas: root
   ApplicationStart:
     - location: scripts/start_server.sh

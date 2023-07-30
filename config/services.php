@@ -41,9 +41,4 @@ return [
     'path' => [
         'base_url' => env('APP_BASE_URL'),
     ],
-
-    'hris_api' => [
-        'base_uri' => env('HRIS_SERVICE_BASE_URL'),
-        'secret' => env('SECRET_SERVICE_BASE_URL'),
-    ],
 ];
