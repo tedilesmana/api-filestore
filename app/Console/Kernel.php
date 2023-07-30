@@ -12,11 +12,7 @@ class Kernel extends ConsoleKernel
      *
      * @var array
      */
-    protected $commands = [
-        Commands\SeederMahasiswaCron::class,
-        Commands\SeederDlbEmployeeCron::class,
-        Commands\SeederEmployeeCron::class,
-    ];
+    protected $commands = [];
 
     /**
      * Define the application's command schedule.
@@ -26,12 +22,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('seederMahasiswa:cron')
-            ->everyMinute();
-        $schedule->command('seederDlbEmployee:cron')
-            ->everyMinute();
-        $schedule->command('seederEmployee:cron')
-            ->everyMinute();
     }
 
     /**

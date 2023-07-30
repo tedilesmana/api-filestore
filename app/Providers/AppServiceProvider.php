@@ -15,20 +15,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->register(\L5Swagger\L5SwaggerServiceProvider::class);
         $models = array(
-            'Auth',
-            'GatewayApplication',
-            'GatewayModule',
-            'GatewayFeature',
-            'GatewayManager',
-            'SeederDb',
-            'MasterLovGroup',
-            'MasterLovValue',
-            'Route',
-            'Menu',
-            'SubMenu',
-            'AdditionalMenu',
-            'Role',
-            'Permission',
+            'ImageStore',
+            'Comment',
         );
 
         foreach ($models as $model) {

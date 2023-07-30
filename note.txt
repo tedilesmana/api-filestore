@@ -17,7 +17,7 @@ php artisan make:migration drop_column_image_url_in_categories_table --table=cat
 php artisan make:migration rename_table_promotions_to_owner_promotions --table=promotions
 php artisan make:migration create_roles_table --create=roles
 php artisan make:migration create_permissions_table --create=permissions
-php artisan make:migration create_modules_table --create=modules
+php artisan make:migration create_comments_table --create=comments
 
 php artisan make:controller Api/Role/RoleController -r
 php artisan make:controller Api/Permission/PermissionController -r

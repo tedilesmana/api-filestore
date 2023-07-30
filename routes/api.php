@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\Api\AdditionalMenu\AdditionalMenuController;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Comment\CommentController;
 use App\Http\Controllers\Api\FileHandler\FileHandlerController;
 use App\Http\Controllers\Api\GatewayManager\ApplicationController;
 use App\Http\Controllers\Api\GatewayManager\FeatureController;
 use App\Http\Controllers\Api\GatewayManager\GatewayManagerController;
 use App\Http\Controllers\Api\GatewayManager\ModuleController;
+use App\Http\Controllers\Api\ImageStore\ImageStoreController;
 use App\Http\Controllers\Api\MasterLovGroup\MasterLovGroupController;
 use App\Http\Controllers\Api\MasterLovValue\MasterLovValueController;
 use App\Http\Controllers\Api\Menu\MenuController;
@@ -28,56 +30,11 @@ use Illuminate\Support\Facades\Route;
 | 
 */
 
-Route::post('seeder-insert-mhs', [SeederDbController::class, 'insertMahasiswa']);
-Route::post('seeder-insert-staff', [SeederDbController::class, 'insertEmployees']);
-Route::post('seeder-insert-staff-dlb', [SeederDbController::class, 'insertDlbEmployees']);
-
-Route::post('auth/login-by-whatsapp', [AuthController::class, 'loginWithWhatsApp']);
-Route::post('auth/login-by-google', [AuthController::class, 'login']);
-Route::post('auth/login-by-whatsapp/validate', [AuthController::class, 'generateTokenWhatsApp']);
-Route::get('unauthorize', [AuthController::class, 'unauthorize']);
-Route::get('gateway-manager-passed/{app}/{module}/{feature}/{title}', [GatewayManagerController::class, 'getRequest']);
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware('auth:api')->group(function () {
-    Route::post('email-submit-presensi', [EmailController::class, 'emailSubmitPresensi']);
-    Route::get('auth/list-jabatan', [AuthController::class, 'listJabatan']);
-    Route::post('auth/logout', [AuthController::class, 'logout']);
-    Route::resource('auth', AuthController::class);
-    Route::resource('gateway-application', ApplicationController::class);
-    Route::resource('gateway-module', ModuleController::class);
-    Route::resource('gateway-feature', FeatureController::class);
-    Route::post('gateway-manager/{app}/{module}/{feature}/{title}', [GatewayManagerController::class, 'postRequest']);
-    Route::put('gateway-manager/{app}/{module}/{feature}/{title}', [GatewayManagerController::class, 'putRequest']);
-    Route::get('gateway-manager/{app}/{module}/{feature}/{title}', [GatewayManagerController::class, 'getRequest']);
-    Route::post('gateway-manager/{app}/{module}/{feature}/{title}/{id}', [GatewayManagerController::class, 'postRequestOneId']);
-    Route::put('gateway-manager/{app}/{module}/{feature}/{title}/{id}', [GatewayManagerController::class, 'putRequestOneId']);
-    Route::delete('gateway-manager/{app}/{module}/{feature}/{title}/{id}', [GatewayManagerController::class, 'deleteRequestOneId']);
-    Route::get('gateway-manager/{app}/{module}/{feature}/{title}/{id}', [GatewayManagerController::class, 'getRequestOneId']);
-    Route::post('gateway-manager/{app}/{module}/{feature}/{title}/{id}/{idTwo}', [GatewayManagerController::class, 'postRequestTwoId']);
-    Route::put('gateway-manager/{app}/{module}/{feature}/{title}/{id}/{idTwo}', [GatewayManagerController::class, 'putRequestTwoId']);
-    Route::delete('gateway-manager/{app}/{module}/{feature}/{title}/{id}/{idTwo}', [GatewayManagerController::class, 'deleteRequestTwoId']);
-    Route::get('gateway-manager/{app}/{module}/{feature}/{title}/{id}/{idTwo}', [GatewayManagerController::class, 'getRequestTwoId']);
-    Route::put('gateway-manager-management/{app}/{module}/{feature}/{title}/{action}', [GatewayManagerController::class, 'managementRequest']);
-    Route::post('gateway-manager/add-request', [GatewayManagerController::class, 'addRequest']);
-    Route::resource('gateway-manager', GatewayManagerController::class);
-    Route::post('delete/file/s3', [FileHandlerController::class, 'deleteFileInS3']);
-    Route::post('upload/file/local', [FileHandlerController::class, 'uploadFileToLocal']);
-    Route::post('upload/file/s3', [FileHandlerController::class, 'uploadFileToS3']);
-    Route::post('upload/file/resize', [FileHandlerController::class, 'uploadFileResize']);
-    Route::post('upload/file/moveToS3', [FileHandlerController::class, 'moveToS3']);
-    Route::resource('route', RouteController::class);
-    Route::resource('menu', MenuController::class);
-    Route::resource('sub-menu', SubMenuController::class);
-    Route::resource('additional-menu', AdditionalMenuController::class);
-    Route::resource('master-lov-value', MasterLovValueController::class);
-    Route::resource('master-lov-group', MasterLovGroupController::class);
-    Route::post('role/add-role-user', [RoleController::class, 'addRoleUser']);
-    Route::delete('role/delete-role-user', [RoleController::class, 'deleteRoleUser']);
-    Route::delete('role/delete-all-role-user', [RoleController::class, 'deleteAllRoleUser']);
-    Route::resource('role', RoleController::class);
-    Route::resource('permission', PermissionController::class);
-});
+Route::post('upload/file/local', [FileHandlerController::class, 'uploadFileToLocal']);
+Route::resource('image-store', ImageStoreController::class);
+Route::resource('comment', CommentController::class);
