@@ -72,7 +72,6 @@ class CommentRepository implements CommentRepositoryInterface
 
             if ($result) {
                 $result->image_store_id = $request->image_store_id;
-                $result->code = $request->code;
                 $result->comment = $request->comment;
 
                 if ($result->isClean()) {

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\ImageStore;
 
 use App\Http\Controllers\BaseController;
-use App\Http\Requests\Category\ImageStoreRequest;
+use App\Http\Requests\ImageStore\ImageStoreRequest;
 use App\Repositories\Interfaces\ImageStore\ImageStoreRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

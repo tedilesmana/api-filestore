@@ -78,6 +78,7 @@ class ImageStoreRepository implements ImageStoreRepositoryInterface
                 $result->size = $request->size;
                 $result->directory = $request->directory;
                 $result->image_url = $request->image_url;
+                $result->category = $request->category;
 
                 if ($result->isClean()) {
                     return $this->apiController->falseResult("Tidak ada perubahan data yang anda masukan", null);
