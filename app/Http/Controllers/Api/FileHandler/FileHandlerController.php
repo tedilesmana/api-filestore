@@ -12,7 +12,7 @@ class FileHandlerController extends BaseController
     public function uploadFileToLocal(Request $request)
     {
         $guessExtension = $request->file('file')->guessExtension();
-        $fileNameWithExt = $request->filename . '#' . Carbon::now()->format('dmyhi') . '.' . $guessExtension;
+        $fileNameWithExt = $request->filename . '-' . Carbon::now()->format('dmyhi') . '.' . $guessExtension;
         $directory = $request->directory;
         $request->file('file')->storeAs('public/files/' . $directory, $fileNameWithExt, 'local');
         $pathURL = Storage::disk('local')->url('public/files/' . $directory . '/' . $fileNameWithExt);
