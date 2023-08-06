@@ -15,7 +15,7 @@ class CreateCommentsTable extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('image_store_id')->unique()->constrained()
+            $table->foreignId('image_store_id')->constrained()
                 ->onUpdate('restrict')
                 ->onDelete('cascade');
             $table->char('code', 25)->unique();
