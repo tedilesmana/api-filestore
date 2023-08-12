@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateImageStoresTable extends Migration
 {
     /**
-     * Run the migrations. 
+     * Run the migrations.
      *
      * @return void
      */
@@ -15,6 +15,9 @@ class CreateImageStoresTable extends Migration
     {
         Schema::create('image_stores', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('category_id')->constrained()
+                ->onUpdate('restrict')
+                ->onDelete('restrict');
             $table->char('code', 25)->unique();
             $table->char('name', 50)->unique();
             $table->char('category', 50);

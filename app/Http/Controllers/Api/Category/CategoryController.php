@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Api\ImageStore;
+namespace App\Http\Controllers\Api\Category;
 
 use App\Http\Controllers\BaseController;
-use App\Http\Requests\ImageStore\ImageStoreRequest;
-use App\Repositories\Interfaces\ImageStore\ImageStoreRepositoryInterface;
+use App\Http\Requests\Category\CategoryRequest;
+use App\Repositories\Interfaces\Category\CategoryRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class ImageStoreController extends BaseController
+class CategoryController extends BaseController
 {
     protected $eloquentRepository;
-    public function __construct(ImageStoreRepositoryInterface $eloquentRepository)
+    public function __construct(CategoryRepositoryInterface $eloquentRepository)
     {
         $this->eloquentRepository = $eloquentRepository;
     }
@@ -51,7 +51,7 @@ class ImageStoreController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(ImageStoreRequest $request)
+    public function store(CategoryRequest $request)
     {
         try {
             $response = $this->eloquentRepository->create($request);
@@ -112,24 +112,10 @@ class ImageStoreController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ImageStoreRequest $request, $id)
+    public function update(CategoryRequest $request, $id)
     {
         try {
             $response = $this->eloquentRepository->update($request, $id);
-            if ($response->success) {
-                return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
-            } else {
-                return $this->errorResponse($response->message, $response->data);
-            }
-        } catch (\Exception $e) {
-            return $this->badResponse($e->getMessage(), null);
-        }
-    }
-
-    public function getTotalImageByCategory()
-    {
-        try {
-            $response = $this->eloquentRepository->getTotalImageByCategory();
             if ($response->success) {
                 return $this->successResponse($response->message, $response->data->data, $response->data->pagination);
             } else {
@@ -157,7 +143,7 @@ class ImageStoreController extends BaseController
                     return $this->errorResponse($response->message, $response->data);
                 }
             } else {
-                $category = DB::table("image_stores")->whereIn('id', $request->list_id)->delete();
+                $category = DB::table("categories")->whereIn('id', $request->list_id)->delete();
 
                 if ($category) {
                     return $this->successResponse("Delete data berhasil",  $category);

@@ -18,6 +18,7 @@ class AppServiceProvider extends ServiceProvider
             'Auth',
             'ImageStore',
             'Comment',
+            'Category',
         );
 
         foreach ($models as $model) {

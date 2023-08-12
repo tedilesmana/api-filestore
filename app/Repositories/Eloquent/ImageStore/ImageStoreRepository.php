@@ -30,20 +30,19 @@ class ImageStoreRepository implements ImageStoreRepositoryInterface
             ->paginate($request->limit ?? 10);
 
         if ($results) {
-            return $this->apiController->trueResult("Data additional menu berhasil di temukan", (object) ["data" => ImageStoreResource::collection($results), "pagination" => setPagination($results)]);
+            return $this->apiController->trueResult("Data gambar berhasil di temukan", (object) ["data" => ImageStoreResource::collection($results), "pagination" => setPagination($results)]);
         } else {
-            return $this->apiController->falseResult("Data additional menu gagal di ambil", null);
+            return $this->apiController->falseResult("Data gambar gagal di ambil", null);
         }
     }
 
     public function getById($id)
     {
-
         $result = ImageStore::find($id);
         if ($result) {
-            return $this->apiController->trueResult("Data additional menu berhasil di temukan", (object) ["data" => new ImageStoreResource($result), "pagination" => null]);
+            return $this->apiController->trueResult("Data gambar berhasil di temukan", (object) ["data" => new ImageStoreResource($result), "pagination" => null]);
         } else {
-            return $this->apiController->falseResult("Data additional menu gagal di temukan", null);
+            return $this->apiController->falseResult("Data gambar gagal di temukan", null);
         }
     }
 
@@ -58,9 +57,9 @@ class ImageStoreRepository implements ImageStoreRepositoryInterface
         $result = ImageStore::create($input);
 
         if ($result) {
-            return $this->apiController->trueResult("Data additional menu berhasil di simpan", (object) ["data" => new ImageStoreResource($result), "pagination" => null]);
+            return $this->apiController->trueResult("Data gambar berhasil di simpan", (object) ["data" => new ImageStoreResource($result), "pagination" => null]);
         } else {
-            return $this->apiController->falseResult("Data additional menu gagal di simpan", null);
+            return $this->apiController->falseResult("Data gambar gagal di simpan", null);
         }
     }
 
@@ -113,20 +112,33 @@ class ImageStoreRepository implements ImageStoreRepositoryInterface
                 $result->delete();
 
                 if ($result) {
-                    deleteFileInS3($result->icon_url);
                     DB::commit();
-                    return $this->apiController->trueResult("Data additional menu berhasil di hapus", (object) ["data" => new ImageStoreResource($result), "pagination" => null]);
+                    return $this->apiController->trueResult("Data gambar berhasil di hapus", (object) ["data" => new ImageStoreResource($result), "pagination" => null]);
                 } else {
                     DB::rollBack();
-                    return $this->apiController->falseResult("Data additional menu gagal di hapus", null);
+                    return $this->apiController->falseResult("Data gambar gagal di hapus", null);
                 }
             } else {
                 DB::rollBack();
-                return $this->apiController->falseResult("Data additional menu tidak di temukan", null);
+                return $this->apiController->falseResult("Data gambar tidak di temukan", null);
             }
         } catch (\Throwable $th) {
             DB::rollBack();
             return $this->apiController->falseResult("Request error", null);
+        }
+    }
+
+    public function getTotalImageByCategory()
+    {
+        $result = ImageStore::select('category_id', DB::raw('count(*) as total'))
+            ->with('category')
+            ->groupBy('category_id')
+            ->get();
+
+        if ($result) {
+            return $this->apiController->trueResult("Data gambar berhasil di temukan", (object) ["data" => new ImageStoreResource($result), "pagination" => null]);
+        } else {
+            return $this->apiController->falseResult("Data gambar gagal di temukan", null);
         }
     }
 }

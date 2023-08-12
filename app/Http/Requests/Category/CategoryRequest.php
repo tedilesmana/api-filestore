@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\ImageStore;
+namespace App\Http\Requests\Category;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use App\Traits\ApiResponser;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ImageStoreRequest extends FormRequest
+class CategoryRequest extends FormRequest
 {
     use ApiResponser;
     /**
@@ -28,29 +28,14 @@ class ImageStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'category_id' => 'required',
             'name' => 'required',
-            'description' => 'required',
-            'image_url' => 'required',
-            'filename' => 'required',
-            'extention' => 'required',
-            'size' => 'required',
-            'directory' => 'required'
         ];
     }
 
     public function messages()
     {
         return [
-            'category_id' => 'Mohon pilih kategori',
-            'name.required' => 'Mohon masukan nama gambar',
-            'description.required' => 'Mohon masukan deskripsi',
-            'image_url.required' => 'Mohon masukan image url',
-            'filename.required' => 'Mohon masukan nama file',
-            'extention.required' => 'Mohon masukan extention file',
-            'size.required' => 'Mohon masukan size file',
-            'directory.required' => 'Mohon masukan directory file',
-
+            'name.required' => 'Mohon masukan nama kategori'
         ];
     }
 

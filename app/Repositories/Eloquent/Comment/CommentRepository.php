@@ -30,9 +30,9 @@ class CommentRepository implements CommentRepositoryInterface
             ->paginate($request->limit ?? 10);
 
         if ($results) {
-            return $this->apiController->trueResult("Data additional menu berhasil di temukan", (object) ["data" => CommentResource::collection($results), "pagination" => setPagination($results)]);
+            return $this->apiController->trueResult("Data comment berhasil di temukan", (object) ["data" => CommentResource::collection($results), "pagination" => setPagination($results)]);
         } else {
-            return $this->apiController->falseResult("Data additional menu gagal di ambil", null);
+            return $this->apiController->falseResult("Data comment gagal di ambil", null);
         }
     }
 
@@ -41,9 +41,9 @@ class CommentRepository implements CommentRepositoryInterface
 
         $result = Comment::find($id);
         if ($result) {
-            return $this->apiController->trueResult("Data additional menu berhasil di temukan", (object) ["data" => new CommentResource($result), "pagination" => null]);
+            return $this->apiController->trueResult("Data comment berhasil di temukan", (object) ["data" => new CommentResource($result), "pagination" => null]);
         } else {
-            return $this->apiController->falseResult("Data additional menu gagal di temukan", null);
+            return $this->apiController->falseResult("Data comment gagal di temukan", null);
         }
     }
 
@@ -58,9 +58,9 @@ class CommentRepository implements CommentRepositoryInterface
         $result = Comment::create($input);
 
         if ($result) {
-            return $this->apiController->trueResult("Data additional menu berhasil di simpan", (object) ["data" => new CommentResource($result), "pagination" => null]);
+            return $this->apiController->trueResult("Data comment berhasil di simpan", (object) ["data" => new CommentResource($result), "pagination" => null]);
         } else {
-            return $this->apiController->falseResult("Data additional menu gagal di simpan", null);
+            return $this->apiController->falseResult("Data comment gagal di simpan", null);
         }
     }
 
@@ -107,16 +107,15 @@ class CommentRepository implements CommentRepositoryInterface
                 $result->delete();
 
                 if ($result) {
-                    deleteFileInS3($result->icon_url);
                     DB::commit();
-                    return $this->apiController->trueResult("Data additional menu berhasil di hapus", (object) ["data" => new CommentResource($result), "pagination" => null]);
+                    return $this->apiController->trueResult("Data comment berhasil di hapus", (object) ["data" => new CommentResource($result), "pagination" => null]);
                 } else {
                     DB::rollBack();
-                    return $this->apiController->falseResult("Data additional menu gagal di hapus", null);
+                    return $this->apiController->falseResult("Data comment gagal di hapus", null);
                 }
             } else {
                 DB::rollBack();
-                return $this->apiController->falseResult("Data additional menu tidak di temukan", null);
+                return $this->apiController->falseResult("Data comment tidak di temukan", null);
             }
         } catch (\Throwable $th) {
             DB::rollBack();

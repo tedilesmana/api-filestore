@@ -1,22 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\AdditionalMenu\AdditionalMenuController;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Category\CategoryController;
 use App\Http\Controllers\Api\Comment\CommentController;
 use App\Http\Controllers\Api\FileHandler\FileHandlerController;
-use App\Http\Controllers\Api\GatewayManager\ApplicationController;
-use App\Http\Controllers\Api\GatewayManager\FeatureController;
-use App\Http\Controllers\Api\GatewayManager\GatewayManagerController;
-use App\Http\Controllers\Api\GatewayManager\ModuleController;
 use App\Http\Controllers\Api\ImageStore\ImageStoreController;
-use App\Http\Controllers\Api\MasterLovGroup\MasterLovGroupController;
-use App\Http\Controllers\Api\MasterLovValue\MasterLovValueController;
-use App\Http\Controllers\Api\Menu\MenuController;
-use App\Http\Controllers\Api\Permission\PermissionController;
-use App\Http\Controllers\Api\Role\RoleController;
-use App\Http\Controllers\Api\Route\RouteController;
-use App\Http\Controllers\Api\Seeder\SeederDbController;
-use App\Http\Controllers\Api\SubMenu\SubMenuController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,6 +32,8 @@ Route::get('unauthorize', [AuthController::class, 'unauthorize']);
 Route::middleware('auth:api')->group(function () {
     Route::post('auth/logout', [AuthController::class, 'logout']);
     Route::post('upload/file/local', [FileHandlerController::class, 'uploadFileToLocal']);
+    Route::get('image-store/total-bycategory', [ImageStoreController::class, 'getTotalImageByCategory']);
     Route::resource('image-store', ImageStoreController::class);
     Route::resource('comment', CommentController::class);
+    Route::resource('category', CategoryController::class);
 });
