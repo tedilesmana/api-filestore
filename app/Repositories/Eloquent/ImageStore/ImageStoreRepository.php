@@ -26,6 +26,7 @@ class ImageStoreRepository implements ImageStoreRepositoryInterface
         $results = ImageStore::select('*')
             ->whereRaw($queryFilter["queryKey"], $queryFilter["queryVal"])
             ->WhereRaw($queryFilter["querySearchKey"], $queryFilter["querySearchVal"])
+            ->with('category')
             ->orderBy($request->orderKey ?? "id", $request->orderBy ?? "asc")
             ->paginate($request->limit ?? 10);
 
@@ -70,6 +71,8 @@ class ImageStoreRepository implements ImageStoreRepositoryInterface
             $result = ImageStore::find($id);
 
             if ($result) {
+                $result->category_id = $request->category_id;
+                $result->user_id = $request->user_id;
                 $result->name = $request->name;
                 $result->description = $request->description;
                 $result->filename = $request->filename;
@@ -77,7 +80,6 @@ class ImageStoreRepository implements ImageStoreRepositoryInterface
                 $result->size = $request->size;
                 $result->directory = $request->directory;
                 $result->image_url = $request->image_url;
-                $result->category = $request->category;
 
                 if ($result->isClean()) {
                     return $this->apiController->falseResult("Tidak ada perubahan data yang anda masukan", null);

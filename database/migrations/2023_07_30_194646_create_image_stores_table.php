@@ -18,9 +18,11 @@ class CreateImageStoresTable extends Migration
             $table->foreignId('category_id')->constrained()
                 ->onUpdate('restrict')
                 ->onDelete('restrict');
+            $table->foreignId('user_id')->constrained()
+                ->onUpdate('restrict')
+                ->onDelete('restrict');
             $table->char('code', 25)->unique();
             $table->char('name', 50)->unique();
-            $table->char('category', 50);
             $table->string('description', 191);
             $table->string('filename', 191);
             $table->char('extention', 10);
