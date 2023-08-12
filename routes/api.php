@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Route;
 | Here is where you can register API routes for your application. These
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
-| 
+|
 */
 
 
@@ -35,6 +35,15 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('upload/file/local', [FileHandlerController::class, 'uploadFileToLocal']);
-Route::resource('image-store', ImageStoreController::class);
-Route::resource('comment', CommentController::class);
+Route::post('auth/register', [AuthController::class, 'register']);
+Route::post('auth/login-by-whatsapp', [AuthController::class, 'loginWithWhatsApp']);
+Route::post('auth/login', [AuthController::class, 'login']);
+Route::post('auth/login-by-whatsapp/validate', [AuthController::class, 'generateTokenWhatsApp']);
+Route::get('unauthorize', [AuthController::class, 'unauthorize']);
+
+Route::middleware('auth:api')->group(function () {
+    Route::post('auth/logout', [AuthController::class, 'logout']);
+    Route::post('upload/file/local', [FileHandlerController::class, 'uploadFileToLocal']);
+    Route::resource('image-store', ImageStoreController::class);
+    Route::resource('comment', CommentController::class);
+});

@@ -22,11 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('phone_number');
             $table->integer('otp')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('username')->unique();
-            $table->string('user_password');
-            $table->string('google_password');
-            $table->string('device_id')->nullable();
-            $table->string('google_id')->nullable();
+            $table->string('password');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
