@@ -74,6 +74,7 @@ class CommentRepository implements CommentRepositoryInterface
                 $result->image_store_id = $request->image_store_id;
                 $result->comment = $request->comment;
                 $result->image_url = $request->image_url;
+                $result->user_id = $request->user_id;
 
                 if ($result->isClean()) {
                     return $this->apiController->falseResult("Tidak ada perubahan data yang anda masukan", null);
