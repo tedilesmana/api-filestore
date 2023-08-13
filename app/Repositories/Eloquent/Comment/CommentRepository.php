@@ -26,6 +26,7 @@ class CommentRepository implements CommentRepositoryInterface
         $results = Comment::select('*')
             ->whereRaw($queryFilter["queryKey"], $queryFilter["queryVal"])
             ->WhereRaw($queryFilter["querySearchKey"], $queryFilter["querySearchVal"])
+            ->with('user')
             ->orderBy($request->orderKey ?? "id", $request->orderBy ?? "asc")
             ->paginate($request->limit ?? 10);
 

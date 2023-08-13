@@ -27,6 +27,7 @@ class ImageStoreRepository implements ImageStoreRepositoryInterface
             ->whereRaw($queryFilter["queryKey"], $queryFilter["queryVal"])
             ->WhereRaw($queryFilter["querySearchKey"], $queryFilter["querySearchVal"])
             ->with('category')
+            ->with('user')
             ->orderBy($request->orderKey ?? "id", $request->orderBy ?? "asc")
             ->paginate($request->limit ?? 10);
 

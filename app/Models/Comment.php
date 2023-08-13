@@ -12,4 +12,8 @@ class Comment extends Model
     use SoftDeletes;
     const CODE = 'A1-COMNT';
     protected $guarded = array('id');
+
+    public function user(){
+        return $this->belongsTo(\App\Models\User::class);
+    }
 }
